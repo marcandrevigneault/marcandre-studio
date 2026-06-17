@@ -5,6 +5,11 @@ async function json<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function text(res: Response): Promise<string> {
+  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  return res.text();
+}
+
 export const fetchGalleries = () =>
   fetch('/api/galleries', { method: 'GET' }).then((r) => json<Gallery[]>(r));
 
@@ -28,4 +33,4 @@ export const signUpload = (folder: 'mas/photos' | 'mas/audio', resourceType: 'im
 export const renderPreview = (g: Gallery) =>
   fetch('/api/preview', {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(g),
-  }).then((r) => r.text());
+  }).then((r) => text(r));

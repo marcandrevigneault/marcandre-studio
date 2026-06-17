@@ -19,7 +19,7 @@ export default function Dashboard() {
     <div>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>Galleries</h1>
-        <a href="/admin/new"><button>+ New gallery</button></a>
+        <a href="/admin/new" role="button" style={{ padding: '0.5rem 1rem', border: '1px solid #999', borderRadius: '4px', textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'inline-block' }}>+ New gallery</a>
       </header>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {galleries.map((g) => (

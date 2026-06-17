@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fetchGalleries, saveGallery } from './api-client';
+import { fetchGalleries, saveGallery, renderPreview } from './api-client';
 
 beforeEach(() => { vi.restoreAllMocks(); });
 
@@ -15,5 +15,10 @@ describe('api-client', () => {
   it('saveGallery POSTs the gallery and throws on non-ok', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{}', { status: 400 }));
     await expect(saveGallery({ slug: 'x' } as any)).rejects.toThrow();
+  });
+
+  it('renderPreview throws on non-ok', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('Error', { status: 500 }));
+    await expect(renderPreview({ slug: 'x' } as any)).rejects.toThrow();
   });
 });
