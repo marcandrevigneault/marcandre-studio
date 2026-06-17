@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminApp from '../../components/admin/AdminApp';
+---
+<BaseLayout title="Studio — Galleries">
+  <main style="max-width:60rem;margin:2rem auto;">
+    <AdminApp view="dashboard" client:only="react" />
+  </main>
+</BaseLayout>
