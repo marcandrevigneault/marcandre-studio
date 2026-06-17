@@ -16,7 +16,10 @@ export const POST: APIRoute = async ({ request }) => {
   // parsed.data.date is a real Date (z.coerce.date() converts the incoming string),
   // satisfying data.date.toLocaleDateString() in the layout.
   const props = { gallery: { data: parsed.data } };
-  const slots = { default: String(parsed.data.body ?? '') };
+  // The intro body is not part of gallerySchema (it strips unknown keys), so read it
+  // from the raw request object — the builder sends the full gallery incl. `body`.
+  const body = typeof rawBody?.body === 'string' ? rawBody.body : '';
+  const slots = { default: body };
 
   const container = await AstroContainer.create();
   const html = await container.renderToString(GalleryLayout, { props, slots });
