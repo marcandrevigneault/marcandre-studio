@@ -24,6 +24,19 @@ export function makeStore(octokit: Octokit) {
     }
   }
 
+  const getGallery = async (slug: string): Promise<GalleryData | null> => {
+    const { owner, repo, branch } = repoParts();
+    try {
+      const res = await octokit.rest.repos.getContent({ owner, repo, path: path(slug), ref: branch });
+      const data = res.data as { content: string; encoding: string };
+      const md = Buffer.from(data.content, data.encoding as BufferEncoding).toString('utf8');
+      return parseGallery(slug, md);
+    } catch (e: any) {
+      if (e.status === 404) return null;
+      throw e;
+    }
+  };
+
   return {
     async listGalleries(): Promise<GalleryData[]> {
       const { owner, repo, branch } = repoParts();
@@ -38,24 +51,13 @@ export function makeStore(octokit: Octokit) {
       const mdFiles = entries.filter((f) => f.type === 'file' && f.name.endsWith('.md'));
       const out: GalleryData[] = [];
       for (const f of mdFiles) {
-        const g = await this.getGallery(f.name.replace(/\.md$/, ''));
+        const g = await getGallery(f.name.replace(/\.md$/, ''));
         if (g) out.push(g);
       }
       return out;
     },
 
-    async getGallery(slug: string): Promise<GalleryData | null> {
-      const { owner, repo, branch } = repoParts();
-      try {
-        const res = await octokit.rest.repos.getContent({ owner, repo, path: path(slug), ref: branch });
-        const data = res.data as { content: string; encoding: string };
-        const md = Buffer.from(data.content, data.encoding as BufferEncoding).toString('utf8');
-        return parseGallery(slug, md);
-      } catch (e: any) {
-        if (e.status === 404) return null;
-        throw e;
-      }
-    },
+    getGallery,
 
     async writeGallery(data: GalleryData, message: string): Promise<void> {
       const { owner, repo, branch } = repoParts();

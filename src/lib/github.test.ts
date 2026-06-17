@@ -63,4 +63,21 @@ describe('github store', () => {
     await store.deleteGallery('x', 'msg');
     expect(ok.rest.repos.deleteFile.mock.calls[0][0].sha).toBe('sha9');
   });
+
+  it('writeGallery creates without sha when file does not exist', async () => {
+    const ok = mockOctokit();
+    ok.rest.repos.getContent.mockRejectedValueOnce({ status: 404 });
+    const store = makeStore(ok);
+    await store.writeGallery(
+      { slug: 'x', title: 'T', date: new Date('2026-01-01'), summary: 's',
+        cover: 'c', draft: false, featured: false,
+        theme: { font: 'serif', motion: 'calm', atmosphere: 'none' },
+        images: [], body: 'body' } as any,
+      'msg',
+    );
+    const call = ok.rest.repos.createOrUpdateFileContents.mock.calls[0][0];
+    expect(call.path).toBe('src/content/galleries/x.md');
+    expect('sha' in call).toBe(false);
+    expect(Buffer.from(call.content, 'base64').toString()).toContain('title: T');
+  });
 });
