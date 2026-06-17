@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import GalleryLayout from '../../layouts/GalleryLayout.astro';
 import { gallerySchema } from '../../lib/frontmatter';
+import globalCss from '../../styles/global.css?raw';
 
 export const prerender = false;
 
@@ -20,5 +21,15 @@ export const POST: APIRoute = async ({ request }) => {
   const container = await AstroContainer.create();
   const html = await container.renderToString(GalleryLayout, { props, slots });
 
-  return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+  // Astro's Container API renderToString returns a full <html> document (because
+  // GalleryLayout wraps BaseLayout which renders the full HTML shell), but it does
+  // NOT inline the bundled global.css — the stylesheet import in BaseLayout becomes
+  // a <link> to a build-time asset that doesn't exist in the preview context.
+  // We inject global.css as an inline <style> so the preview is fully styled with
+  // all design tokens, font moods, atmosphere rules, and per-gallery CSS variables.
+  const styled = html.includes('</head>')
+    ? html.replace('</head>', `<style>${globalCss}</style></head>`)
+    : `<style>${globalCss}</style>` + html;
+
+  return new Response(styled, { status: 200, headers: { 'content-type': 'text/html' } });
 };
