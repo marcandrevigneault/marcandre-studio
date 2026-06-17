@@ -25,6 +25,7 @@ function req(body: any) {
 }
 
 describe('galleries API', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
   it('GET returns the list', async () => {
     const res = await GET({} as any);
     expect(res.status).toBe(200);
