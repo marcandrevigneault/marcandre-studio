@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { signUpload, deliveryUrl } from './cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import { signUpload, deliveryUrl, listAudio } from './cloudinary';
 
 beforeEach(() => {
   vi.stubEnv('CLOUDINARY_CLOUD_NAME', 'demo');
@@ -23,5 +24,34 @@ describe('cloudinary', () => {
   it('deliveryUrl builds a transform URL', () => {
     expect(deliveryUrl('mas/photos/x', 'w_1600,f_auto,q_auto'))
       .toBe('https://res.cloudinary.com/demo/image/upload/w_1600,f_auto,q_auto/mas/photos/x');
+  });
+
+  it('listAudio returns mapped audio resources', async () => {
+    const executeStub = vi.fn().mockResolvedValue({
+      resources: [
+        { secure_url: 'https://res.cloudinary.com/demo/video/upload/mas/audio/track1.mp3', public_id: 'mas/audio/track1' },
+      ],
+    });
+    const max_resultsStub = vi.fn().mockReturnValue({ execute: executeStub });
+    const expressionStub = vi.fn().mockReturnValue({ max_results: max_resultsStub });
+    vi.spyOn(cloudinary.search, 'expression').mockImplementation(expressionStub);
+
+    const result = await listAudio();
+    expect(result).toEqual([
+      { src: 'https://res.cloudinary.com/demo/video/upload/mas/audio/track1.mp3', title: 'track1' },
+    ]);
+    expect(expressionStub).toHaveBeenCalledWith('folder:mas/audio');
+    expect(max_resultsStub).toHaveBeenCalledWith(100);
+    expect(executeStub).toHaveBeenCalled();
+  });
+
+  it('listAudio returns empty array when resources is absent', async () => {
+    const executeStub = vi.fn().mockResolvedValue({});
+    const max_resultsStub = vi.fn().mockReturnValue({ execute: executeStub });
+    const expressionStub = vi.fn().mockReturnValue({ max_results: max_resultsStub });
+    vi.spyOn(cloudinary.search, 'expression').mockImplementation(expressionStub);
+
+    const result = await listAudio();
+    expect(result).toEqual([]);
   });
 });

@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { createHash } from 'node:crypto';
+import { utils as cloudinaryUtils } from 'cloudinary';
 import { getEnv } from './env';
 
 function configure() {
@@ -17,10 +17,10 @@ export function signUpload(params: { folder: string; resourceType: 'image' | 'vi
   // Fixed timestamp granularity keeps the test deterministic within a second; in
   // production Date.now() drives it. Sign the params Cloudinary requires.
   const timestamp = Math.floor(Date.now() / 1000);
-  const toSign = `folder=${params.folder}&timestamp=${timestamp}`;
-  const signature = createHash('sha1')
-    .update(toSign + env.cloudinaryApiSecret)
-    .digest('hex');
+  const signature = cloudinaryUtils.api_sign_request(
+    { folder: params.folder, timestamp },
+    env.cloudinaryApiSecret,
+  );
   return {
     timestamp,
     signature,
