@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST } from './login';
+import { POST } from '../../../pages/api/auth/login';
 
 beforeEach(() => {
   vi.stubEnv('ADMIN_PASSWORD', 'hunter2');

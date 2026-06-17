@@ -7,7 +7,7 @@ vi.mock('../../../lib/github', () => ({
   deleteGallery: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { GET, POST } from './index';
+import { GET, POST } from '../../../pages/api/galleries/index';
 import { writeGallery } from '../../../lib/github';
 
 const VALID = {
