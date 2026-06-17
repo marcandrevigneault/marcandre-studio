@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { getEnv } from './env';
+import { requireEnvVar } from './env';
 
 export const SESSION_COOKIE_NAME = 'mas_session';
 const MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
@@ -15,13 +15,13 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export function verifyPassword(input: string): boolean {
-  return safeEqual(input, getEnv().adminPassword);
+  return safeEqual(input, requireEnvVar('ADMIN_PASSWORD'));
 }
 
 export function createSessionCookie(): string {
   const exp = Math.floor(Date.now() / 1000) + MAX_AGE_SECONDS;
   const payload = String(exp);
-  const token = `${payload}.${sign(payload, getEnv().sessionSecret)}`;
+  const token = `${payload}.${sign(payload, requireEnvVar('SESSION_SECRET'))}`;
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
     'HttpOnly', 'Secure', 'SameSite=Strict', 'Path=/',
@@ -40,7 +40,7 @@ export function isValidSession(cookieHeader: string | null): boolean {
   const token = match.slice(SESSION_COOKIE_NAME.length + 1);
   const [payload, sig] = token.split('.');
   if (!payload || !sig) return false;
-  if (!safeEqual(sig, sign(payload, getEnv().sessionSecret))) return false;
+  if (!safeEqual(sig, sign(payload, requireEnvVar('SESSION_SECRET')))) return false;
   const exp = Number(payload);
   return Number.isFinite(exp) && exp > Math.floor(Date.now() / 1000);
 }

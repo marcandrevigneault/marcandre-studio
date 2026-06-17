@@ -31,3 +31,10 @@ export function getEnv(): Env {
   if (missing.length) throw new Error(`Missing env vars: ${missing.join(', ')}`);
   return out;
 }
+
+/** Read a single env var directly without requiring all vars. For auth module. */
+export function requireEnvVar(name: string): string {
+  const val = process.env[name];
+  if (!val) throw new Error(`Missing env var: ${name}`);
+  return val;
+}

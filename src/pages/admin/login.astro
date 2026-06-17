@@ -1,0 +1,30 @@
+---
+export const prerender = false;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isValidSession } from '../../lib/auth';
+if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect('/admin');
+---
+<BaseLayout title="Admin login" bareNav={true}>
+  <main style="max-width:22rem;margin:4rem auto;">
+    <h1>Studio</h1>
+    <form id="login">
+      <input type="password" name="password" placeholder="Password" autofocus required
+             style="width:100%;padding:.6rem;margin:.5rem 0;" />
+      <button type="submit" style="width:100%;padding:.6rem;">Enter</button>
+      <p id="err" style="color:#c00;display:none;">Wrong password.</p>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('login');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = form.password.value;
+      const res = await fetch('/api/auth/login', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) location.href = '/admin';
+      else document.getElementById('err').style.display = 'block';
+    });
+  </script>
+</BaseLayout>
