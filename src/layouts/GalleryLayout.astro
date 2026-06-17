@@ -1,0 +1,120 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AmbientAudio from '../components/AmbientAudio.astro';
+import PhotoGrid from '../components/PhotoGrid.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  gallery: CollectionEntry<'galleries'>;
+}
+const { gallery } = Astro.props;
+const { data } = gallery;
+const t = data.theme;
+
+// Build the per-gallery CSS variable overrides. Only set what's defined so the
+// rest falls back to the global defaults.
+const vars: Record<string, string> = {};
+if (t.paper) vars['--paper'] = t.paper;
+if (t.ink) vars['--ink'] = t.ink;
+if (t.muted) vars['--muted'] = t.muted;
+if (t.accent) vars['--accent'] = t.accent;
+if (t.ink) vars['--line'] = `color-mix(in oklab, ${t.ink} 14%, transparent)`;
+const styleAttr = Object.entries(vars)
+  .map(([k, v]) => `${k}:${v}`)
+  .join(';');
+
+const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+---
+
+<BaseLayout title={data.title} description={data.summary}>
+  <article
+    class="gallery"
+    style={styleAttr}
+    data-font={t.font}
+    data-motion={t.motion}
+    data-atmosphere={t.atmosphere}
+  >
+    <header class="hero" style={`--cover: url('${data.cover}')`}>
+      <div class="hero-inner wrap">
+        <p class="eyebrow" data-reveal>{data.place ?? 'Gallery'} · {dateText}</p>
+        <h1 data-reveal="1">{data.title}</h1>
+        <p class="lede measure" data-reveal="2">{data.summary}</p>
+      </div>
+      <div class="scrim"></div>
+    </header>
+
+    <div class="body wrap">
+      <slot />
+      {data.images.length > 0 && <PhotoGrid images={data.images} />}
+    </div>
+
+    <p class="back wrap">
+      <a href="/photography/">← All galleries</a>
+    </p>
+  </article>
+
+  {data.audio && <AmbientAudio src={data.audio.src} title={data.audio.title} loop={data.audio.loop} />}
+</BaseLayout>
+
+<style>
+  .gallery { min-height: 100vh; }
+
+  .hero {
+    position: relative;
+    min-height: min(86vh, 760px);
+    display: flex;
+    align-items: flex-end;
+    padding-block: clamp(3rem, 10vw, 7rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: var(--cover);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--paper) 92%, transparent) 0%,
+      color-mix(in oklab, var(--paper) 55%, transparent) 35%,
+      transparent 75%
+    );
+  }
+  .hero-inner { width: min(100% - 2 * var(--pad), 1200px); }
+  .lede {
+    margin-inline: 0;
+    font-size: clamp(1.05rem, 1rem + 0.5vw, 1.35rem);
+    color: var(--muted);
+    max-width: 60ch;
+  }
+
+  .body {
+    padding-top: clamp(2rem, 6vw, 4rem);
+  }
+  /* Optional prose intro placed via <slot/> before the photos. */
+  .body :global(.intro) {
+    width: min(100% - 2 * var(--pad), var(--measure));
+    margin: 0 auto clamp(2rem, 6vw, 4rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.6rem);
+    line-height: 1.5;
+  }
+
+  .back {
+    padding-block: clamp(2rem, 6vw, 3.5rem);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+  }
+  .back a { color: var(--muted); }
+  .back a:hover { color: var(--accent); }
+</style>

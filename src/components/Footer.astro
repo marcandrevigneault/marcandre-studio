@@ -1,0 +1,29 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="sig">Marc&#8209;André Vigneault</p>
+    <p class="note">Photography · Science · Travel · Poetry — made with care.</p>
+    <p class="meta">© {year} · Built with Astro</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: clamp(4rem, 12vw, 9rem);
+    border-top: 1px solid var(--line);
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+  }
+  .wrap { display: grid; gap: 0.35rem; }
+  .sig { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
+  .note { color: var(--muted); margin: 0; }
+  .meta {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 0.5rem 0 0;
+  }
+</style>

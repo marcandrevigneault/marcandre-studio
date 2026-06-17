@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const published = (c: { data: { draft: boolean } }) => import.meta.env.DEV || !c.data.draft;
+const articles = (await getCollection('articles', published)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Collect topics for a simple filter rail.
+const topics = [...new Set(articles.flatMap((a) => a.data.topics))].sort();
+---
+
+<BaseLayout title="Science" description="Essays and notes on hydroponics, optics, physics, and the things worth explaining.">
+  <header class="intro wrap">
+    <p class="eyebrow" data-reveal>Writing</p>
+    <h1 data-reveal="1">Science, explained plainly.</h1>
+    <p class="lede measure" data-reveal="2">
+      Notes and essays on the things I'm learning and teaching — hydroponics, light, and
+      whatever else earns a closer look.
+    </p>
+    {topics.length > 0 && (
+      <ul class="topics" data-reveal="3">
+        {topics.map((t) => <li>{t}</li>)}
+      </ul>
+    )}
+  </header>
+
+  <ul class="post-list measure">
+    {articles.map((a, i) => (
+      <li data-reveal={String(i % 5)}>
+        <a href={`/science/${a.id}/`}>
+          <p class="post-meta">
+            {a.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            {a.data.readingTime && <span> · {a.data.readingTime}</span>}
+          </p>
+          <h2>{a.data.title}</h2>
+          <p class="post-summary">{a.data.summary}</p>
+          {a.data.topics.length > 0 && <p class="post-topics">{a.data.topics.join(' · ')}</p>}
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  {articles.length === 0 && (
+    <p class="measure empty">No articles yet — add a <code>.mdx</code> file in <code>src/content/articles/</code>.</p>
+  )}
+</BaseLayout>
+
+<style>
+  .intro { padding-block: clamp(3rem, 10vw, 6rem) clamp(2rem, 5vw, 3rem); }
+  .lede { color: var(--muted); font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem); }
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .topics li {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+  }
+
+  .post-list { list-style: none; margin: 0; padding: 0; }
+  .post-list li { border-top: 1px solid var(--line); }
+  .post-list li:last-child { border-bottom: 1px solid var(--line); }
+  .post-list a {
+    display: block;
+    padding-block: clamp(1.5rem, 4vw, 2.5rem);
+    transition: padding-left 0.4s var(--ease);
+  }
+  .post-list a:hover { padding-left: 0.6rem; }
+  .post-meta {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.4rem;
+  }
+  .post-list h2 { font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem); margin: 0 0 0.4rem; transition: color 0.3s var(--ease); }
+  .post-list a:hover h2 { color: var(--accent); }
+  .post-summary { color: var(--muted); margin: 0 0 0.5rem; max-width: 60ch; }
+  .post-topics {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin: 0;
+  }
+  .empty { padding-block: 3rem; color: var(--muted); }
+</style>

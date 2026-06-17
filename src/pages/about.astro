@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="About Marc-André Vigneault.">
+  <section class="about measure">
+    <p class="eyebrow" data-reveal>About</p>
+    <h1 data-reveal="1">Marc-André Vigneault</h1>
+    <div class="prose" data-reveal="2">
+      <p>
+        I'm a maker with a wide field of view — photography, video, science, travel, and the
+        occasional poem. This is where those threads live together.
+      </p>
+      <p>
+        By day I'm drawn to how things work; by light I'm drawn to how they look. The science
+        writing here is my attempt to explain ideas clearly — from hydroponics to optics — and
+        the galleries are where I let images simply be.
+      </p>
+      <p>Say hello — or just look around.</p>
+      <ul class="links">
+        <li><a href="mailto:marcandre.vigneault.96@gmail.com">Email</a></li>
+        <li><a href="https://github.com/marcandrevigneault" rel="me">GitHub</a></li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about { padding-block: clamp(3rem, 10vw, 7rem); }
+  .prose { font-size: 1.1rem; }
+  .prose p { color: var(--muted); }
+  .links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+  .links a {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 3px;
+    color: var(--ink);
+  }
+  .links a:hover { color: var(--accent); }
+</style>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g21" gradientTransform="rotate(95 0.5 0.5)"><stop offset="0%" stop-color="#eef3f7"/><stop offset="50%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#f7f9fb"/></linearGradient>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g21)"/>
+  <circle cx="800" cy="700" r="600" fill="#ffffff" opacity="0.5"/>
+  <rect width="1600" height="1000" filter="url(#n)" opacity="0.05"/>
+  <text x="50%" y="96%" text-anchor="middle" font-family="Georgia,serif" font-size="50" fill="rgba(255,255,255,0.28)" letter-spacing="2">UYUNI</text>
+</svg>

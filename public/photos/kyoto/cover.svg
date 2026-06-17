@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g21" gradientTransform="rotate(110 0.5 0.5)"><stop offset="0%" stop-color="#1a1813"/><stop offset="50%" stop-color="#3b342a"/><stop offset="100%" stop-color="#0d0c09"/></linearGradient>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g21)"/>
+  <circle cx="1200" cy="300" r="500" fill="#c89b6a" opacity="0.18"/>
+  <rect width="1600" height="1000" filter="url(#n)" opacity="0.05"/>
+  <text x="50%" y="96%" text-anchor="middle" font-family="Georgia,serif" font-size="50" fill="rgba(255,255,255,0.28)" letter-spacing="2">KYOTO</text>
+</svg>

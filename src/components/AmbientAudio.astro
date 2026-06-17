@@ -1,0 +1,109 @@
+---
+interface Props {
+  src: string;
+  title: string;
+  loop?: boolean;
+}
+const { src, title, loop = true } = Astro.props;
+---
+
+<div class="ambient" data-ambient>
+  <audio preload="none" loop={loop} src={src}></audio>
+  <button type="button" class="toggle" aria-pressed="false" aria-label={`Play ambient sound: ${title}`}>
+    <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="label">
+      <span class="state">Sound</span>
+      <span class="track">{title}</span>
+    </span>
+  </button>
+</div>
+
+<style>
+  .ambient {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 45;
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.55rem 0.9rem 0.55rem 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--paper) 70%, transparent);
+    backdrop-filter: blur(10px);
+    color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .toggle:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .label { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+  .state {
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .track { font-size: 0.82rem; }
+
+  /* Equalizer bars — still when paused, animate when playing. */
+  .bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; width: 18px; }
+  .bars i {
+    width: 3px;
+    height: 30%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: height 0.3s var(--ease);
+  }
+  [data-ambient].playing .bars i {
+    animation: eq 1s var(--ease) infinite alternate;
+  }
+  .bars i:nth-child(2) { animation-delay: 0.15s; }
+  .bars i:nth-child(3) { animation-delay: 0.3s; }
+  .bars i:nth-child(4) { animation-delay: 0.45s; }
+  @keyframes eq {
+    from { height: 25%; }
+    to { height: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-ambient].playing .bars i { animation: none; height: 60%; }
+  }
+</style>
+
+<script>
+  // Polite ambient audio: tap to play, tap to pause. Never autoplays.
+  document.querySelectorAll('[data-ambient]').forEach((root) => {
+    const audio = root.querySelector('audio') as HTMLAudioElement;
+    const btn = root.querySelector('.toggle') as HTMLButtonElement;
+    const state = root.querySelector('.state') as HTMLElement;
+    btn.addEventListener('click', async () => {
+      if (audio.paused) {
+        try {
+          audio.volume = 0.0;
+          await audio.play();
+          // Gentle fade-in.
+          let v = 0;
+          const id = setInterval(() => {
+            v = Math.min(0.55, v + 0.05);
+            audio.volume = v;
+            if (v >= 0.55) clearInterval(id);
+          }, 60);
+          root.classList.add('playing');
+          btn.setAttribute('aria-pressed', 'true');
+          state.textContent = 'Playing';
+        } catch {
+          state.textContent = 'Unavailable';
+        }
+      } else {
+        audio.pause();
+        root.classList.remove('playing');
+        btn.setAttribute('aria-pressed', 'false');
+        state.textContent = 'Sound';
+      }
+    });
+  });
+</script>

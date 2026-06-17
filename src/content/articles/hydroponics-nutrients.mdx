@@ -1,0 +1,81 @@
+---
+title: How Much Salt in the Water? A Gentle Intro to Hydroponic Nutrients
+subtitle: From "what is EC?" to mixing your first reservoir with confidence.
+date: 2026-02-18
+summary: Plants in water don't eat soil — they drink a precisely salted solution. Here's how to think about electrical conductivity, ppm, and getting the ratio right.
+topics: [hydroponics, chemistry]
+readingTime: 9 min
+cover: /photos/science/hydroponics.svg
+---
+
+When you grow without soil, you take on a job the soil used to do for free: deciding,
+precisely, what the roots get to drink. That sounds intimidating. It isn't — it mostly
+comes down to one number and a little arithmetic.
+
+## The one number: electrical conductivity
+
+Pure water barely conducts electricity. Dissolve mineral salts in it — nitrates,
+phosphates, potassium — and it conducts much better. So we can *measure* how much
+nutrient is in solution simply by measuring how well the water conducts. That's
+**electrical conductivity (EC)**, usually reported in millisiemens per centimetre
+(mS/cm).
+
+A useful rule of thumb relates EC to total dissolved solids:
+
+$$
+\text{ppm} \approx k \cdot \text{EC} \quad\text{where}\quad k \in [500, 700]
+$$
+
+The conversion factor $k$ depends on which standard your meter uses — a "500 scale"
+meter and a "700 scale" meter will read the *same* water differently. This is the single
+most common source of confusion for beginners, so always note the scale your meter uses.
+
+> A typical leafy-green reservoir runs around **EC 1.4–1.8 mS/cm**. Fruiting crops like
+> tomatoes want more — often **EC 2.0–3.0**.
+
+## Why the ratio matters more than the total
+
+Plants don't drink nutrients in arbitrary proportions. The classic Hoagland-style ratio
+keeps nitrogen, potassium, and the rest in balance. If you only chase a target EC, you
+can hit the right *amount* of salt while having the wrong *kind* — too much of one ion,
+not enough of another.
+
+Here's the mass of a single nutrient you need to reach a target concentration $C$
+(in mg/L) in a reservoir of volume $V$ (in litres):
+
+$$
+m = \frac{C \cdot V}{1000} \quad [\text{grams}]
+$$
+
+So to hit 150 mg/L of nitrogen in a 40 L reservoir:
+
+```python
+C = 150   # mg/L target
+V = 40    # litres
+mass_g = C * V / 1000
+print(mass_g)   # -> 6.0 grams of N (as elemental nitrogen)
+```
+
+In practice you don't dose elemental nitrogen — you dose a *fertiliser salt* that's only
+partly nitrogen, so you divide by that fraction. Calcium nitrate, for instance, is about
+15.5% nitrogen by mass, so you'd need roughly `6.0 / 0.155 ≈ 38.7 g` of it.
+
+## A sane mixing routine
+
+1. **Start with the right water.** Reverse-osmosis or rainwater gives you a known
+   baseline (EC ≈ 0). Tap water already carries dissolved minerals — measure it first.
+2. **Add nutrients, then mix, then measure.** Never trust the label's "X mL per litre"
+   blindly; meters don't lie, labels round.
+3. **Adjust pH last.** Most crops absorb nutrients best between **pH 5.5 and 6.2**. Adjust
+   *after* the salts are in, because adding them shifts pH on its own.
+4. **Top up with plain water, not nutrients.** As plants drink, water leaves faster than
+   salt — so EC *rises* over time. Counterintuitive, but it's why you top up with water.
+
+---
+
+That's the whole mental model: conductivity tells you *how much*, the ratio tells you
+*what kind*, and pH decides whether the roots can actually take it up. Get those three
+talking to each other and the rest is observation.
+
+*Next time: building a cheap inline EC/pH monitor with a microcontroller, and logging it
+so the reservoir tells you when it's drifting.*
