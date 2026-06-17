@@ -30,6 +30,19 @@ describe('auth', () => {
   it('rejects tampered or missing session', () => {
     expect(isValidSession(null)).toBe(false);
     expect(isValidSession(`${SESSION_COOKIE_NAME}=garbage.sig`)).toBe(false);
+    // malformed token with no signature part
+    expect(isValidSession(`${SESSION_COOKIE_NAME}=nosighere`)).toBe(false);
+  });
+
+  it('rejects an expired session cookie', () => {
+    const value = createSessionCookie().split(';')[0];
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(Date.now() + 8 * 24 * 60 * 60 * 1000); // 8 days later
+      expect(isValidSession(value)).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('clearSessionCookie expires the cookie', () => {
