@@ -8,14 +8,33 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.3",
+    "@astrojs/react": "^5.0.7",
     "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/vercel": "^10.0.8",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@octokit/rest": "^22.0.1",
     "astro": "^6.4.8",
+    "cloudinary": "^2.10.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.2.0",
     "katex": "^0.17.0",
+    "react": "^19.2.7",
+    "react-colorful": "^5.7.0",
+    "react-dom": "^19.2.7",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "vitest": "^4.1.9"
   }
 }
