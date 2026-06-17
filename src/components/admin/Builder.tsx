@@ -5,6 +5,8 @@ import { saveGallery } from './api-client';
 import MetaFields from './MetaFields';
 import ThemeControls from './ThemeControls';
 import LivePreview from './LivePreview';
+import PhotoUploader from './PhotoUploader';
+import MusicPicker from './MusicPicker';
 
 export default function Builder({ initial }: { initial?: Gallery }) {
   const [gallery, setGallery] = useState<Gallery>(initial ?? emptyGallery());
@@ -29,7 +31,8 @@ export default function Builder({ initial }: { initial?: Gallery }) {
       <div>
         <MetaFields value={gallery} onChange={setGallery} lockSlug={isEdit} />
         <ThemeControls value={gallery} onChange={setGallery} />
-        {/* PhotoUploader + MusicPicker mount here in Task 10 */}
+        <PhotoUploader value={gallery} onChange={setGallery} />
+        <MusicPicker value={gallery} onChange={setGallery} />
         <div style={{ marginTop: '1rem' }}>
           <button onClick={onSave}>{isEdit ? 'Save changes' : 'Publish'}</button>
           <p>{status}</p>
