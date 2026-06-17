@@ -27,18 +27,23 @@ function Row({ img, index, onPatch, onCover, isCover }: {
 
 export default function PhotoUploader({ value, onChange }: { value: Gallery; onChange: (g: Gallery) => void; }) {
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<string[]>([]);
 
   async function onFiles(files: FileList | null) {
     if (!files) return;
-    setBusy(true); setError('');
+    setBusy(true); setErrors([]);
+    let accumulated = [...value.images];
+    let cover = value.cover;
+    const failures: string[] = [];
     for (const file of Array.from(files)) {
       try {
         const { url } = await uploadToCloudinary(file, 'mas/photos', 'image');
-        const img: GalleryImage = { src: url, alt: '', span: 'single' };
-        onChange({ ...value, images: [...value.images, img], cover: value.cover || url });
-      } catch (e) { setError(`${file.name}: ${(e as Error).message}`); }
+        accumulated = [...accumulated, { src: url, alt: '', span: 'single' }];
+        if (!cover) cover = url;
+      } catch (e) { failures.push(`${file.name}: ${(e as Error).message}`); }
     }
+    onChange({ ...value, images: accumulated, cover });
+    setErrors(failures);
     setBusy(false);
   }
 
@@ -59,7 +64,7 @@ export default function PhotoUploader({ value, onChange }: { value: Gallery; onC
       <input type="file" accept="image/*" multiple disabled={busy}
         onChange={(e) => onFiles(e.target.files)} />
       {busy && <span> uploading…</span>}
-      {error && <p style={{ color: '#c00' }}>{error}</p>}
+      {errors.map((err, i) => <p key={i} style={{ color: '#c00' }}>{err}</p>)}
       <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={value.images.map((im) => im.src)} strategy={verticalListSortingStrategy}>
           {value.images.map((img, i) => (
