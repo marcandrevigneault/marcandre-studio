@@ -124,6 +124,13 @@ The build output in `dist/` is a plain static site, so it works on Vercel, Netli
 GitHub Pages, Cloudflare Pages, or any static host. Before deploying, set your real
 domain in `astro.config.mjs` (`site:`).
 
+## Admin
+
+`/admin` is the private gallery builder — password-protected and unlinked from the public
+site. It lets you create, edit, preview, and publish photo galleries through a browser UI.
+For one-time setup instructions (GitHub, Vercel, Cloudinary, env vars), see
+[docs/admin-setup.md](docs/admin-setup.md).
+
 ## Next sections
 
 Video, Poetry, and Travel are scaffolded as "coming soon" on the homepage. Each can reuse
