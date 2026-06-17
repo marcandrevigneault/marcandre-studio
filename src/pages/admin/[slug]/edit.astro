@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdminApp from '../../../components/admin/AdminApp';
+import { getGallery } from '../../../lib/github';
+const gallery = await getGallery(Astro.params.slug!);
+if (!gallery) return Astro.redirect('/admin');
+// Serialize Date -> string for the client component.
+const initial = { ...gallery, date: new Date(gallery.date).toISOString().slice(0, 10) };
+---
+<BaseLayout title={`Studio — Edit ${gallery.slug}`}>
+  <main style="max-width:80rem;margin:2rem auto;">
+    <AdminApp view="builder" initial={initial} client:only="react" />
+  </main>
+</BaseLayout>
