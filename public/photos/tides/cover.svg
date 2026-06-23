@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g31" gradientTransform="rotate(98 0.5 0.5)"><stop offset="0%" stop-color="#1b2a31"/><stop offset="55%" stop-color="#33484f"/><stop offset="100%" stop-color="#0d1418"/></linearGradient>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g31)"/>
+  <ellipse cx="800" cy="560" rx="900" ry="220" fill="#5a8fa6" opacity="0.18"/>
+  <rect y="560" width="1600" height="440" fill="#0a1115" opacity="0.45"/>
+  <rect width="1600" height="1000" filter="url(#n)" opacity="0.06"/>
+  <text x="50%" y="96%" text-anchor="middle" font-family="Georgia,serif" font-size="50" fill="rgba(220,229,232,0.22)" letter-spacing="3">FORCHU</text>
+</svg>

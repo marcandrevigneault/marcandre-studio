@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g31" gradientTransform="rotate(96 0.5 0.5)"><stop offset="0%" stop-color="#26343a"/><stop offset="50%" stop-color="#4a626b"/><stop offset="100%" stop-color="#10171a"/></linearGradient>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g31)"/>
+  <ellipse cx="1050" cy="330" rx="520" ry="160" fill="#e6c98f" opacity="0.2"/>
+  <rect y="520" width="1600" height="480" fill="#0a1013" opacity="0.4"/>
+  <rect width="1600" height="1000" filter="url(#n)" opacity="0.06"/>
+</svg>
