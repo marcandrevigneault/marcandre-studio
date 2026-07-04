@@ -54,3 +54,10 @@ export function sessionExpiry(cookieHeader: string | null): number | null {
   const payload = match.slice(SESSION_COOKIE_NAME.length + 1).split('.')[0];
   return Number(payload) - Math.floor(Date.now() / 1000);
 }
+
+/** True when the request arrived over HTTPS (behind Vercel's proxy or direct). */
+export function isSecureRequest(request: Request): boolean {
+  const url = new URL(request.url);
+  if (url.protocol === 'https:') return true;
+  return request.headers.get('x-forwarded-proto')?.split(',')[0].trim() === 'https';
+}

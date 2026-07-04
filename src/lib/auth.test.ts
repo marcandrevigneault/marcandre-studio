@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   verifyPassword, createSessionCookie, clearSessionCookie,
-  isValidSession, sessionExpiry, SESSION_COOKIE_NAME,
+  isValidSession, sessionExpiry, isSecureRequest, SESSION_COOKIE_NAME,
 } from './auth';
 
 beforeEach(() => {
@@ -61,5 +61,18 @@ describe('auth', () => {
     expect(remaining!).toBeLessThanOrEqual(30 * 24 * 60 * 60);
     expect(sessionExpiry(null)).toBeNull();
     expect(sessionExpiry(`${SESSION_COOKIE_NAME}=garbage.sig`)).toBeNull();
+  });
+
+  it('isSecureRequest detects https via protocol', () => {
+    expect(isSecureRequest(new Request('https://x/admin'))).toBe(true);
+  });
+
+  it('isSecureRequest is false for plain http with no forwarded-proto header', () => {
+    expect(isSecureRequest(new Request('http://x/admin'))).toBe(false);
+  });
+
+  it('isSecureRequest honors x-forwarded-proto: https behind a proxy', () => {
+    const request = new Request('http://x/admin', { headers: { 'x-forwarded-proto': 'https' } });
+    expect(isSecureRequest(request)).toBe(true);
   });
 });

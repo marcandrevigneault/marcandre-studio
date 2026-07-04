@@ -1,5 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
-import { isValidSession } from './lib/auth';
+import { isValidSession, sessionExpiry, createSessionCookie, isSecureRequest } from './lib/auth';
+
+const SESSION_REFRESH_THRESHOLD_SECONDS = 15 * 24 * 60 * 60; // half the 30-day session lifetime
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -17,5 +19,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (pathname.startsWith('/admin') && !isLoginPage && !authed) {
     return context.redirect('/admin/login');
   }
-  return next();
+
+  const response = await next();
+
+  // Sliding session refresh: on an authenticated admin page view, re-issue the
+  // cookie once it's past its halfway point so active users never get logged out.
+  if (pathname.startsWith('/admin') && !isLoginPage && context.request.method === 'GET') {
+    const remaining = sessionExpiry(cookie);
+    if (remaining !== null && remaining < SESSION_REFRESH_THRESHOLD_SECONDS) {
+      response.headers.append('set-cookie', createSessionCookie(isSecureRequest(context.request)));
+    }
+  }
+
+  return response;
 });
