@@ -115,11 +115,19 @@ const { blocks } = Astro.props;
     const slides = Array.from(root.querySelectorAll('.slide')) as HTMLElement[];
     const dots = Array.from(root.querySelectorAll('.dot')) as HTMLElement[];
     if (dots[0]) dots[0].classList.add('on');
-    const to = (i: number) => slides[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const to = (i: number) => slides[i]?.scrollIntoView({ behavior: prefersReduced.matches ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
     root.querySelector('[data-prev]')?.addEventListener('click', () => to(Math.max(0, active() - 1)));
     root.querySelector('[data-next]')?.addEventListener('click', () => to(Math.min(slides.length - 1, active() + 1)));
     dots.forEach((d) => d.addEventListener('click', () => to(Number(d.dataset.goto))));
-    function active() { return Math.round(track.scrollLeft / track.clientWidth); }
+    function active() {
+      let best = 0, bestDist = Infinity;
+      slides.forEach((s, i) => {
+        const d = Math.abs(s.offsetLeft - track.scrollLeft);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      return best;
+    }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
