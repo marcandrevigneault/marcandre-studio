@@ -24,7 +24,8 @@ const styleAttr = Object.entries(vars)
   .map(([k, v]) => `${k}:${v}`)
   .join(';');
 
-const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+const validDate = data.date instanceof Date && !isNaN(data.date.getTime());
+const dateText = validDate ? data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Draft — no date yet';
 ---
 
 <BaseLayout title={data.title} description={data.summary}>
