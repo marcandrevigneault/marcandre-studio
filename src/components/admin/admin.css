@@ -13,9 +13,10 @@
    - body-level rules and the bare h1/h2/h3 tag selector — BaseLayout /
      global.css already own document-level typography.
    - the old flat photo-list rules (.photos, .photo, .thumb, .pmeta, .pcap,
-     .palt, .pactions, .tinybtn, standalone .grip) — superseded by the
-     block-based editor (.blocks/.block/...). The one exception is
-     `.block-head .grip`, which the new block rows still use.
+     .palt, .pactions, standalone .grip) — superseded by the
+     block-based editor (.blocks/.block/...). The two exceptions are
+     `.block-head .grip`, which the new block rows still use, and
+     `.tinybtn`, which the block editor's cover/remove buttons still use.
    ============================================================ */
 
 :root {
@@ -173,6 +174,10 @@ textarea.input { resize:vertical; min-height:64px; }
 .block-head { display:flex; align-items:center; gap:10px; padding:8px 10px; border-bottom:1px solid var(--line); background:var(--sunk); }
 .block-head .grip { color:var(--faint); cursor:grab; letter-spacing:-2px; }
 .block-actions { display:flex; gap:4px; }
+.tinybtn { border:1px solid var(--line); background:var(--surface); color:var(--muted); width:28px;height:28px;border-radius:2px; display:grid;place-items:center; font-size:12px; transition:all .18s var(--ease); }
+.tinybtn:hover { color:var(--ink); border-color:var(--accent); }
+.tinybtn.on { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.tinybtn.del:hover { color:#c0453b; border-color:#c0453b; }
 .block-body { padding:10px; display:flex; flex-direction:column; gap:9px; }
 .layoutrail { display:flex; gap:4px; margin-right:auto; }
 .layoutrail button { width:30px; height:22px; padding:0; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--faint); display:grid; place-items:center; transition:all .16s var(--ease); }

@@ -191,14 +191,12 @@ export default function BlocksEditor({ blocks, cover, onChange, onCoverChange }:
   async function onFiles(files: FileList | null) {
     if (!files) return;
     setErrors([]);
-    let acc = blocksRef.current;
     for (const file of Array.from(files)) {
       const pid = startPending(file.name);
       try {
         const { url } = await uploadToCloudinary(file, 'mas/photos', 'image');
         const img: BlockImage = { id: newId(), src: url, alt: altFromName(file.name), caption: '' };
-        acc = [...acc, { ...newBlock('single'), images: [img] }];
-        onChange(acc);
+        onChange([...blocksRef.current, { ...newBlock('single'), images: [img] }]);
       } catch (e) {
         setErrors((prev) => [...prev, `${file.name}: ${(e as Error).message}`]);
       } finally {
