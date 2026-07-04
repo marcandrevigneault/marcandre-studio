@@ -1,0 +1,707 @@
+<title>Studio Admin — Redesign Mockup</title>
+<style>
+  /* ============================================================
+     marcandre.studio — admin redesign mockup
+     Grounded in the site's own design tokens (see global.css):
+     warm paper, serif display, #9a6b4f accent, 2px editorial radius.
+     ============================================================ */
+
+  :root {
+    /* light (paper) — the studio's daylight identity */
+    --paper:   #fbfaf7;
+    --surface: #ffffff;
+    --sunk:    #f4f1ea;
+    --ink:     #1a1916;
+    --muted:   #6f6b63;
+    --faint:   #9a958c;
+    --line:    #e7e3da;
+    --accent:  #9a6b4f;
+    --accent-ink: #ffffff;
+    --good:    #4f7a55;
+    --warn:    #b0742a;
+    --shadow:  0 1px 2px rgba(26,25,22,.04), 0 8px 30px -12px rgba(26,25,22,.18);
+
+    --font-serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --font-sans:  ui-sans-serif,system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+    --font-mono:  ui-monospace,"SF Mono","JetBrains Mono","Fira Code",Menlo,monospace;
+
+    --radius: 3px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:   #16140f;
+      --surface: #1e1b15;
+      --sunk:    #14120d;
+      --ink:     #ece7dd;
+      --muted:   #a49c8f;
+      --faint:   #79726650;
+      --line:    #322d24;
+      --accent:  #c99a76;
+      --accent-ink: #16140f;
+      --good:    #8fb78f;
+      --warn:    #d6a25f;
+      --shadow:  0 1px 2px rgba(0,0,0,.3), 0 12px 40px -14px rgba(0,0,0,.6);
+    }
+  }
+  /* viewer toggle wins over OS in both directions */
+  :root[data-theme="dark"] {
+    --paper:#16140f; --surface:#1e1b15; --sunk:#14120d; --ink:#ece7dd;
+    --muted:#a49c8f; --faint:#79726650; --line:#322d24; --accent:#c99a76;
+    --accent-ink:#16140f; --good:#8fb78f; --warn:#d6a25f;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 40px -14px rgba(0,0,0,.6);
+  }
+  :root[data-theme="light"] {
+    --paper:#fbfaf7; --surface:#ffffff; --sunk:#f4f1ea; --ink:#1a1916;
+    --muted:#6f6b63; --faint:#9a958c; --line:#e7e3da; --accent:#9a6b4f;
+    --accent-ink:#ffffff; --good:#4f7a55; --warn:#b0742a;
+    --shadow:0 1px 2px rgba(26,25,22,.04), 0 8px 30px -12px rgba(26,25,22,.18);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .5s var(--ease), color .5s var(--ease);
+  }
+  h1,h2,h3 { font-family: var(--font-serif); font-weight: 500; letter-spacing: -.01em; margin: 0; line-height: 1.1; }
+  input, button, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  .eyebrow {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .mono { font-family: var(--font-mono); }
+
+  /* ---------- top view switcher (mockup control) ---------- */
+  .switcher {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 20px;
+    background: color-mix(in oklab, var(--paper) 82%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .switcher .tag { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-right:auto; }
+  .seg { display:inline-flex; background:var(--sunk); border:1px solid var(--line); border-radius:999px; padding:3px; }
+  .seg button {
+    border:0; background:transparent; color:var(--muted);
+    padding:6px 16px; border-radius:999px; font-size:13px; font-weight:500;
+    transition: all .25s var(--ease);
+  }
+  .seg button[aria-selected="true"] { background:var(--surface); color:var(--ink); box-shadow: var(--shadow); }
+  .theme-btn {
+    border:1px solid var(--line); background:var(--surface); color:var(--muted);
+    width:34px; height:34px; border-radius:999px; display:grid; place-items:center;
+    font-size:15px; transition: all .25s var(--ease);
+  }
+  .theme-btn:hover { color:var(--ink); border-color:var(--accent); }
+
+  .view { display:none; animation: rise .5s var(--ease) both; }
+  .view.active { display:block; }
+  @keyframes rise { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .view, .switcher, * { animation:none !important; } }
+
+  /* ============================================================
+     LOGIN
+     ============================================================ */
+  .login-wrap {
+    min-height: calc(100vh - 55px);
+    display: grid; place-items: center;
+    padding: 40px 20px;
+    background:
+      radial-gradient(120% 90% at 50% -10%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 60%);
+  }
+  .login-card {
+    width: 100%; max-width: 360px; text-align: center;
+  }
+  .wordmark {
+    font-family: var(--font-serif); font-size: 34px; letter-spacing:-.02em;
+  }
+  .wordmark .dot { color: var(--accent); }
+  .login-sub { color: var(--muted); font-size: 13.5px; margin: 8px 0 30px; }
+  .rule { height:1px; background:var(--line); width:44px; margin: 0 auto 30px; }
+  .field { text-align:left; margin-bottom: 14px; }
+  .field label { display:block; font-size:12px; color:var(--muted); margin-bottom:7px; letter-spacing:.02em; }
+  .input {
+    width:100%; padding: 12px 14px;
+    background: var(--surface); border:1px solid var(--line); border-radius: var(--radius);
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .input:focus { outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent); }
+  .input.pw { letter-spacing:.2em; }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding: 12px 18px; border:1px solid transparent; border-radius: var(--radius);
+    background: var(--accent); color: var(--accent-ink); font-weight:600; font-size:14px;
+    transition: transform .12s var(--ease), filter .2s var(--ease);
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { transform: translateY(1px); }
+  .btn.block { width:100%; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color:var(--accent); color:var(--accent); filter:none; }
+  .btn[disabled] { opacity:.55; cursor:default; }
+  .login-foot { margin-top:22px; font-size:12px; color:var(--faint); }
+  .login-foot .spin { display:none; }
+
+  /* ============================================================
+     BUILDER
+     ============================================================ */
+  .topbar {
+    display:flex; align-items:center; gap:14px;
+    padding: 12px 22px; border-bottom:1px solid var(--line);
+    background: var(--surface);
+  }
+  .topbar .wm { font-family:var(--font-serif); font-size:19px; }
+  .topbar .wm .dot { color:var(--accent); }
+  .crumb { color:var(--muted); font-size:13px; display:flex; align-items:center; gap:8px; }
+  .crumb .sep { color:var(--faint); }
+  .crumb .now { color:var(--ink); }
+  .topbar .grow { margin-left:auto; }
+  .savestate { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); margin-right:4px; }
+  .savedot { width:7px; height:7px; border-radius:50%; background:var(--good); box-shadow:0 0 0 3px color-mix(in oklab, var(--good) 22%, transparent); }
+  .iconbtn { border:1px solid var(--line); background:var(--surface); color:var(--muted); width:36px;height:36px;border-radius:var(--radius); display:grid;place-items:center; font-size:15px; transition:all .2s var(--ease);}
+  .iconbtn:hover { color:var(--ink); border-color:var(--accent); }
+
+  .builder {
+    display:grid;
+    grid-template-columns: minmax(0,1fr) minmax(0, 46%);
+    gap: 0;
+    align-items:start;
+  }
+  @media (max-width: 900px) { .builder { grid-template-columns: 1fr; } .preview-pane { display:none; } }
+
+  .editor { padding: 26px clamp(20px,3vw,40px) 80px; min-width:0; }
+  .editor-inner { max-width: 620px; margin:0 auto; display:flex; flex-direction:column; gap: 26px; }
+
+  .card {
+    background: var(--surface); border:1px solid var(--line); border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card > header { padding: 16px 20px 12px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:10px; }
+  .card > header h3 { font-size:16px; }
+  .card > header .hint { font-size:12px; color:var(--faint); margin-left:auto; }
+  .card .body { padding: 18px 20px 22px; display:flex; flex-direction:column; gap:16px; }
+
+  .row { display:flex; gap:14px; }
+  .row > * { flex:1; min-width:0; }
+  .lbl { display:block; font-size:11.5px; letter-spacing:.03em; color:var(--muted); margin-bottom:6px; }
+  .title-input {
+    width:100%; font-family:var(--font-serif); font-size:26px; letter-spacing:-.01em;
+    background:transparent; border:0; border-bottom:1.5px solid var(--line); padding:4px 0 8px;
+    transition: border-color .2s var(--ease);
+  }
+  .title-input:focus { outline:none; border-color:var(--accent); }
+  .slug { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:12px; color:var(--faint); }
+  .slug .chip { background:var(--sunk); border:1px solid var(--line); border-radius:999px; padding:2px 9px; color:var(--muted); }
+  textarea.input { resize:vertical; min-height:64px; }
+
+  /* palette swatches */
+  .swatches { display:grid; grid-template-columns: repeat(4,1fr); gap:10px; }
+  .swatch {
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+    background:var(--surface); text-align:left; transition: border-color .2s var(--ease), transform .12s var(--ease);
+  }
+  .swatch:hover { border-color:var(--accent); transform:translateY(-1px); }
+  .swatch .chipc { height:34px; border-bottom:1px solid var(--line); }
+  .swatch .meta { padding:6px 8px; }
+  .swatch .nm { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .swatch .hx { font-family:var(--font-mono); font-size:10.5px; color:var(--faint); }
+
+  /* segmented control */
+  .control-row { display:grid; grid-template-columns: 92px 1fr; align-items:center; gap:12px; }
+  .segbar { display:inline-flex; background:var(--sunk); border:1px solid var(--line); border-radius:var(--radius); padding:3px; gap:2px; flex-wrap:wrap; }
+  .segbar button {
+    border:0; background:transparent; color:var(--muted); padding:6px 12px; border-radius:2px; font-size:12.5px;
+    transition: all .2s var(--ease);
+  }
+  .segbar button[aria-selected="true"] { background:var(--surface); color:var(--ink); box-shadow:var(--shadow); font-weight:500; }
+
+  /* dropzone + photo grid */
+  .dropzone {
+    border:1.5px dashed color-mix(in oklab, var(--accent) 40%, var(--line));
+    border-radius:var(--radius); padding:22px; text-align:center; color:var(--muted);
+    background: color-mix(in oklab, var(--accent) 4%, transparent);
+    transition: all .2s var(--ease);
+  }
+  .dropzone:hover { border-color:var(--accent); color:var(--ink); background: color-mix(in oklab, var(--accent) 8%, transparent); }
+  .dropzone .big { font-size:14px; color:var(--ink); margin-bottom:3px; }
+  .dropzone .small { font-size:12px; }
+
+  .photos { display:flex; flex-direction:column; gap:10px; }
+  .photo {
+    display:grid; grid-template-columns: 20px 84px 1fr auto; gap:12px; align-items:center;
+    padding:10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface);
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .photo:hover { border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
+  .photo.cover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .grip { color:var(--faint); cursor:grab; text-align:center; letter-spacing:-2px; }
+  .thumb { width:84px; height:58px; border-radius:2px; position:relative; overflow:hidden; }
+  .thumb .star {
+    position:absolute; top:4px; left:4px; width:18px;height:18px; border-radius:50%;
+    display:grid;place-items:center; font-size:10px; background:rgba(0,0,0,.4); color:#fff; backdrop-filter:blur(2px);
+  }
+  .photo.cover .thumb .star { background:var(--accent); color:var(--accent-ink); }
+  .pmeta { min-width:0; display:flex; flex-direction:column; gap:5px; }
+  .pcap { width:100%; background:transparent; border:0; border-bottom:1px solid transparent; padding:2px 0; font-size:13.5px; }
+  .pcap:hover { border-bottom-color:var(--line); }
+  .pcap:focus { outline:none; border-bottom-color:var(--accent); }
+  .palt { width:100%; background:transparent; border:0; padding:0; font-size:11.5px; color:var(--faint); }
+  .palt:focus { outline:none; color:var(--muted); }
+  .pactions { display:flex; align-items:center; gap:4px; }
+  .tinybtn { border:1px solid var(--line); background:var(--surface); color:var(--muted); width:28px;height:28px;border-radius:2px; display:grid;place-items:center; font-size:12px; transition:all .18s var(--ease); }
+  .tinybtn:hover { color:var(--ink); border-color:var(--accent); }
+  .tinybtn.on { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .tinybtn.del:hover { color:#c0453b; border-color:#c0453b; }
+
+  /* ---- layout blocks (photos) ---- */
+  .blocks { display:flex; flex-direction:column; gap:12px; }
+  .block { border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); overflow:hidden; transition:border-color .2s var(--ease); }
+  .block:hover { border-color: color-mix(in oklab, var(--accent) 40%, var(--line)); }
+  .block.cover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .block-head { display:flex; align-items:center; gap:10px; padding:8px 10px; border-bottom:1px solid var(--line); background:var(--sunk); }
+  .block-head .grip { color:var(--faint); cursor:grab; letter-spacing:-2px; }
+  .block-actions { display:flex; gap:4px; }
+  .block-body { padding:10px; display:flex; flex-direction:column; gap:9px; }
+  .layoutrail { display:flex; gap:4px; margin-right:auto; }
+  .layoutrail button { width:30px; height:22px; padding:0; border:1px solid var(--line); border-radius:3px; background:var(--surface); color:var(--faint); display:grid; place-items:center; transition:all .16s var(--ease); }
+  .layoutrail button:hover { border-color:var(--accent); color:var(--muted); }
+  .layoutrail button[aria-selected="true"] { border-color:var(--accent); color:var(--accent); background:color-mix(in oklab, var(--accent) 12%, var(--surface)); box-shadow:0 0 0 1px var(--accent); }
+  .layoutrail svg rect { fill:currentColor; }
+  .layoutrail svg circle { fill:currentColor; }
+  .layoutrail svg line { stroke:currentColor; stroke-width:1.4; stroke-linecap:round; }
+  .tiles { display:grid; gap:6px; }
+  .tiles .t { border-radius:2px; aspect-ratio:3/2; position:relative; }
+  .tiles .t.tall { aspect-ratio:2/3; }
+  .tiles .star2 { position:absolute; top:5px; left:5px; width:17px;height:17px;border-radius:50%; display:grid;place-items:center; font-size:9px; background:rgba(0,0,0,.4); color:#fff; }
+  .block.cover .tiles .star2 { background:var(--accent); color:var(--accent-ink); }
+  .tiles.l-full { grid-template-columns:1fr; }
+  .tiles.l-two, .tiles.l-twotall, .tiles.l-quad, .tiles.l-textrow { grid-template-columns:1fr 1fr; }
+  .tiles.l-textrow { align-items:stretch; }
+  .side-text { min-height:0; height:100%; font-size:12.5px; line-height:1.5; resize:none; }
+  .blockcap { width:100%; background:transparent; border:0; border-bottom:1px solid transparent; padding:3px 2px; font-size:13px; }
+  .blockcap:hover { border-bottom-color:var(--line); }
+  .blockcap:focus { outline:none; border-bottom-color:var(--accent); }
+  .addblock { border:1px dashed var(--line); background:transparent; color:var(--muted); padding:11px; border-radius:var(--radius); font-size:13px; transition:all .2s var(--ease); }
+  .addblock:hover { border-color:var(--accent); color:var(--accent); }
+  .tiles.l-mosaic { grid-template-columns:1.7fr 1fr; grid-template-rows:repeat(3,44px); }
+  .tiles.l-mosaic .t { aspect-ratio:auto; }
+  .tiles.l-mosaic .t:first-child { grid-row:1 / 4; }
+  .tiles.l-carousel { grid-template-columns:1fr; }
+  .carousel-tile { position:relative; aspect-ratio:16/8; }
+  .carousel-tile .chev { position:absolute; top:50%; transform:translateY(-50%); width:22px;height:22px;border-radius:50%; background:rgba(0,0,0,.4); color:#fff; display:grid;place-items:center; font-size:12px; }
+  .carousel-tile .chev.l{ left:6px; } .carousel-tile .chev.r{ right:6px; }
+  .dots { display:flex; gap:5px; justify-content:center; align-items:center; }
+  .dots i { width:6px;height:6px;border-radius:50%; background:var(--faint); display:block; transition:all .2s var(--ease); }
+  .dots i.on { background:var(--accent); width:16px; border-radius:3px; }
+  .filmstrip { display:flex; gap:6px; align-items:center; }
+  .filmstrip .fs { width:46px;height:31px;border-radius:2px; flex:none; }
+  .filmstrip .addfs { width:34px;height:31px;border-radius:2px;border:1px dashed var(--line); color:var(--muted); background:transparent; flex:none; }
+  .filmstrip .addfs:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* ---- preview block layouts ---- */
+  .g-blocks { display:flex; flex-direction:column; gap:16px; }
+  .pb .im { border-radius:2px; }
+  .pb .cap { font-family:var(--font-sans); font-size:10.5px; color:var(--g-muted); padding:5px 2px 0; }
+  .pb-full .im { aspect-ratio:16/8; }
+  .pb-two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .pb-two .im { aspect-ratio:3/2; }
+  .pb-textrow { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:center; }
+  .pb-textrow .im { aspect-ratio:4/5; }
+  .pb-textrow .ptext { margin:0; font-size:13px; line-height:1.55; color:var(--g-ink); }
+  .pb-twotall { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .pb-twotall .im { aspect-ratio:2/3; }
+  .pb-quad { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .pb-quad .im { aspect-ratio:3/2; }
+  .pb-mosaic { display:grid; grid-template-columns:1.7fr 1fr; grid-template-rows:repeat(3,58px); gap:8px; }
+  .pb-mosaic .im { aspect-ratio:auto; }
+  .pb-mosaic .im:first-child { grid-row:1 / 4; }
+  .pb-carousel { text-align:center; }
+  .pb-carousel .im { aspect-ratio:16/9; }
+  .pb-carousel .dots { margin-top:9px; }
+  .pb-carousel .dots i { background:rgba(255,255,255,.28); }
+  .pb-carousel .dots i.on { background:var(--g-accent); width:16px; }
+
+  /* sound */
+  .track { display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--sunk); }
+  .play { width:38px;height:38px;border-radius:50%; border:1px solid var(--line); background:var(--surface); color:var(--accent); display:grid;place-items:center; font-size:13px; flex:none; }
+  .wave { flex:1; display:flex; align-items:center; gap:2px; height:26px; }
+  .wave i { display:block; width:3px; background: color-mix(in oklab, var(--accent) 45%, var(--line)); border-radius:2px; }
+  .track .tname { font-size:12.5px; color:var(--muted); flex:none; }
+
+  /* toggles + publish */
+  .toggle { display:flex; align-items:center; gap:10px; }
+  .switch { width:38px;height:22px;border-radius:999px; background:var(--line); position:relative; transition:background .2s var(--ease); flex:none; }
+  .switch::after { content:""; position:absolute; top:2px; left:2px; width:18px;height:18px;border-radius:50%; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform .2s var(--ease); }
+  .switch.on { background:var(--accent); }
+  .switch.on::after { transform: translateX(16px); }
+  .toggle .tt { font-size:13px; }
+  .toggle .td { font-size:11.5px; color:var(--faint); }
+
+  .publishbar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .publishbar .toggles { display:flex; gap:22px; margin-right:auto; }
+  .btn.lg { padding:13px 26px; font-size:14.5px; }
+  .publish-note { width:100%; font-size:12px; color:var(--faint); }
+
+  /* ---------- live preview pane ---------- */
+  .preview-pane {
+    position: sticky; top: 55px; height: calc(100vh - 55px);
+    padding: 18px 22px 18px 0;
+    display:flex; flex-direction:column;
+  }
+  .preview-head { display:flex; align-items:center; gap:8px; padding:0 4px 12px; }
+  .preview-head .eyebrow { margin-right:auto; }
+  .livedot { width:6px;height:6px;border-radius:50%; background:var(--good); animation: pulse 2s var(--ease) infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  .frame {
+    flex:1; border:1px solid var(--line); border-radius:10px; overflow:hidden;
+    box-shadow: var(--shadow); background:#0f1518; display:flex; flex-direction:column;
+  }
+  .frame-bar { display:flex; align-items:center; gap:6px; padding:9px 12px; background: color-mix(in oklab, #0f1518 88%, #fff); border-bottom:1px solid rgba(255,255,255,.06); }
+  .frame-bar .d { width:9px;height:9px;border-radius:50%; background:rgba(255,255,255,.18); }
+  .frame-bar .url { margin-left:8px; font-family:var(--font-mono); font-size:11px; color:rgba(220,229,232,.5); }
+
+  /* the preview renders a gallery in ITS OWN world (Between Tides = dark, grain) */
+  .gallery-preview {
+    --g-paper:#0f1518; --g-ink:#dce5e8; --g-muted:#7d8b91; --g-accent:#5a8fa6;
+    flex:1; overflow-y:auto; background:var(--g-paper); color:var(--g-ink);
+    font-family: var(--font-serif);
+  }
+  .gallery-preview::-webkit-scrollbar { width:8px; }
+  .gallery-preview::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:8px; }
+  .g-hero { position:relative; padding: 30px 26px 26px; min-height: 220px; display:flex; flex-direction:column; justify-content:flex-end;
+    background: linear-gradient(180deg, #24343a, #0f1518); }
+  .g-hero::after { content:""; position:absolute; inset:0; opacity:.05; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .g-eyebrow { font-family:var(--font-sans); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--g-muted); margin-bottom:10px; }
+  .g-title { font-size:30px; color:var(--g-ink); letter-spacing:-.02em; margin-bottom:10px; }
+  .g-lede { font-size:14px; color:var(--g-muted); line-height:1.55; max-width:44ch; }
+  .g-body { padding: 22px 26px 30px; }
+  .g-intro { font-size:15px; line-height:1.6; color:var(--g-ink); max-width:52ch; margin:0 auto 22px; }
+  .g-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .g-grid .gi { border-radius:2px; overflow:hidden; }
+  .g-grid .gi.wide { grid-column:1 / -1; }
+  .gi .im { aspect-ratio: 3/2; }
+  .gi.wide .im { aspect-ratio: 16/7; }
+  .gi .cap { font-family:var(--font-sans); font-size:10.5px; color:var(--g-muted); padding:6px 2px 0; }
+  .g-audio { position:sticky; bottom:0; display:flex; align-items:center; gap:10px; margin:18px 12px 0; padding:10px 14px;
+    background: color-mix(in oklab, #0f1518 80%, transparent); backdrop-filter:blur(8px);
+    border:1px solid rgba(90,143,166,.3); border-radius:999px; }
+  .g-audio .pp { width:26px;height:26px;border-radius:50%; border:1px solid var(--g-accent); color:var(--g-accent); display:grid;place-items:center; font-size:10px; }
+  .g-audio .at { font-family:var(--font-sans); font-size:11.5px; color:var(--g-muted); }
+</style>
+
+<div class="switcher">
+  <span class="tag">Redesign mockup · marcandre.studio/admin</span>
+  <div class="seg" role="tablist">
+    <button role="tab" aria-selected="true" data-view="login">Sign in</button>
+    <button role="tab" aria-selected="false" data-view="builder">Gallery builder</button>
+  </div>
+  <button class="theme-btn" id="themeToggle" title="Toggle light / dark">◐</button>
+</div>
+
+<!-- ================= LOGIN ================= -->
+<section class="view active" id="view-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="wordmark">Studio<span class="dot">.</span></div>
+      <p class="login-sub">Marc-André's private workspace</p>
+      <div class="rule"></div>
+      <div class="field">
+        <label for="pw">Password</label>
+        <input class="input pw" id="pw" type="password" value="············" autocomplete="current-password" />
+      </div>
+      <button class="btn block" id="signin">Sign in</button>
+      <p class="login-foot" id="loginfoot">Stays signed in for 30 days on this device.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BUILDER ================= -->
+<section class="view" id="view-builder">
+  <div class="topbar">
+    <span class="wm">Studio<span class="dot">.</span></span>
+    <span class="crumb"><span class="sep">/</span> Galleries <span class="sep">/</span> <span class="now">Between Tides</span></span>
+    <span class="grow"></span>
+    <span class="savestate"><span class="savedot"></span> Saved draft · just now</span>
+    <button class="iconbtn" title="Sign out">⎋</button>
+    <button class="btn" id="publishBtn">Publish</button>
+  </div>
+
+  <div class="builder">
+    <!-- editor -->
+    <div class="editor">
+      <div class="editor-inner">
+
+        <!-- Details -->
+        <div class="card">
+          <header><h3>Details</h3><span class="hint">what & where</span></header>
+          <div class="body">
+            <div>
+              <input class="title-input" value="Between Tides" />
+              <div class="slug">url <span class="chip mono">/photography/between-tides</span> · auto from title</div>
+            </div>
+            <div class="row">
+              <div><span class="lbl">Place</span><input class="input" value="Cape Forchu, Nova Scotia" /></div>
+              <div><span class="lbl">Date</span><input class="input" value="November 2025" /></div>
+            </div>
+            <div>
+              <span class="lbl">Summary</span>
+              <textarea class="input">A grey coast between the tides — fog on the water, salt on the lens, and the long patience of slow weather.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- The look -->
+        <div class="card">
+          <header><h3>The look</h3><span class="hint">this gallery's world</span></header>
+          <div class="body">
+            <div class="swatches">
+              <button class="swatch"><span class="chipc" style="background:#0f1518"></span><span class="meta"><div class="nm">Paper</div><div class="hx">#0f1518</div></span></button>
+              <button class="swatch"><span class="chipc" style="background:#dce5e8"></span><span class="meta"><div class="nm">Ink</div><div class="hx">#dce5e8</div></span></button>
+              <button class="swatch"><span class="chipc" style="background:#7d8b91"></span><span class="meta"><div class="nm">Muted</div><div class="hx">#7d8b91</div></span></button>
+              <button class="swatch"><span class="chipc" style="background:#5a8fa6"></span><span class="meta"><div class="nm">Accent</div><div class="hx">#5a8fa6</div></span></button>
+            </div>
+            <div class="control-row"><span class="lbl" style="margin:0">Type</span>
+              <div class="segbar"><button aria-selected="true">Serif</button><button>Sans</button><button>Mono</button></div>
+            </div>
+            <div class="control-row"><span class="lbl" style="margin:0">Motion</span>
+              <div class="segbar"><button>None</button><button aria-selected="true">Calm</button><button>Drift</button><button>Reveal</button></div>
+            </div>
+            <div class="control-row"><span class="lbl" style="margin:0">Atmosphere</span>
+              <div class="segbar"><button>None</button><button aria-selected="true">Grain</button><button>Vignette</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photos -->
+        <div class="card">
+          <header><h3>Photos</h3><span class="hint">pick a layout per block · drag to reorder</span></header>
+          <div class="body">
+            <div class="dropzone"><div class="big">Drop photos here, or click to choose</div><div class="small">JPG or PNG · uploads straight to your library</div></div>
+            <div class="blocks">
+
+              <div class="block cover" data-layout="full">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn on" title="Cover photo">★</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-full"><div class="t" style="background:linear-gradient(135deg,#3a4a50,#0f1518)"><span class="star2">★</span></div></div>
+                  <input class="blockcap" value="The cape disappears, an hour at a time." />
+                </div>
+              </div>
+
+              <div class="block" data-layout="two">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-two"><div class="t" style="background:linear-gradient(135deg,#4a5259,#20282c)"></div><div class="t" style="background:linear-gradient(135deg,#5b6b72,#2c3a40)"></div></div>
+                  <input class="blockcap" value="Low tide gives the rocks back — twice a day, without fail." />
+                </div>
+              </div>
+
+              <div class="block" data-layout="text-left">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-textrow"><div class="t" style="background:linear-gradient(135deg,#38484e,#151c1f)"></div>
+                    <textarea class="input side-text">The light works harder than you think — steady in the mist while everything else goes soft.</textarea></div>
+                </div>
+              </div>
+
+              <div class="block" data-layout="twotall">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-twotall"><div class="t tall" style="background:linear-gradient(160deg,#46565d,#141c20)"></div><div class="t tall" style="background:linear-gradient(160deg,#5a6a70,#1e262a)"></div></div>
+                  <input class="blockcap" value="Two verticals — kelp, and the last of the foam." />
+                </div>
+              </div>
+
+              <div class="block" data-layout="mosaic">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-mosaic"><div class="t" style="background:linear-gradient(135deg,#3a4a50,#0f1518)"></div><div class="t" style="background:linear-gradient(135deg,#54646b,#222c30)"></div><div class="t" style="background:linear-gradient(135deg,#48585f,#161e22)"></div><div class="t" style="background:linear-gradient(135deg,#5e6e74,#26302f)"></div></div>
+                  <input class="blockcap" value="One wide frame, and three details from the same shore." />
+                </div>
+              </div>
+
+              <div class="block" data-layout="carousel">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-carousel"><div class="t carousel-tile" style="background:linear-gradient(135deg,#46565d,#141c20)"><span class="chev l">‹</span><span class="chev r">›</span><div class="dots" style="position:absolute;left:0;right:0;bottom:7px"><i class="on"></i><i></i><i></i><i></i><i></i></div></div></div>
+                  <div class="filmstrip"><div class="fs" style="background:linear-gradient(135deg,#46565d,#141c20)"></div><div class="fs" style="background:linear-gradient(135deg,#5a6a70,#1e262a)"></div><div class="fs" style="background:linear-gradient(135deg,#3f4f55,#10171a)"></div><div class="fs" style="background:linear-gradient(135deg,#54646b,#222c30)"></div><div class="fs" style="background:linear-gradient(135deg,#48585f,#161e22)"></div><button class="addfs">+</button></div>
+                  <input class="blockcap" value="Five frames from the same headland — swipe through." />
+                </div>
+              </div>
+
+              <div class="block" data-layout="quad">
+                <div class="block-head"><span class="grip">⋮⋮</span><div class="layoutrail" data-rail></div>
+                  <span class="block-actions"><button class="tinybtn" title="Set as cover">☆</button><button class="tinybtn del" title="Remove">✕</button></span></div>
+                <div class="block-body">
+                  <div class="tiles l-quad"><div class="t" style="background:linear-gradient(135deg,#3f4f55,#10171a)"></div><div class="t" style="background:linear-gradient(135deg,#54646b,#222c30)"></div><div class="t" style="background:linear-gradient(135deg,#48585f,#161e22)"></div><div class="t" style="background:linear-gradient(135deg,#5e6e74,#26302f)"></div></div>
+                  <input class="blockcap" value="Four frames from one grey hour." />
+                </div>
+              </div>
+
+              <button class="addblock">+ Add a block</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sound -->
+        <div class="card">
+          <header><h3>Sound</h3><span class="hint">optional ambient loop</span></header>
+          <div class="body">
+            <div class="track">
+              <button class="play">▶</button>
+              <div class="wave" id="wave"></div>
+              <span class="tname">Surf at Cape Forchu · 2:14</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Publish -->
+        <div class="card">
+          <header><h3>Publish</h3></header>
+          <div class="body">
+            <div class="publishbar">
+              <div class="toggles">
+                <div class="toggle"><span class="switch on" data-toggle></span><span><div class="tt">Draft</div><div class="td">hidden from the site</div></span></div>
+                <div class="toggle"><span class="switch" data-toggle></span><span><div class="tt">Featured</div><div class="td">top of photography</div></span></div>
+              </div>
+              <button class="btn lg" id="publishBtn2">Publish gallery</button>
+              <p class="publish-note">Saves the gallery and rebuilds the site — live in about a minute.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- live preview -->
+    <div class="preview-pane">
+      <div class="preview-head">
+        <span class="eyebrow">Live preview</span>
+        <span class="livedot"></span><span style="font-size:11.5px;color:var(--faint)">updating as you type</span>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">marcandre.studio/photography/between-tides</span></div>
+        <div class="gallery-preview">
+          <div class="g-hero">
+            <div class="g-eyebrow">Cape Forchu, Nova Scotia · November 2025</div>
+            <div class="g-title">Between Tides</div>
+            <div class="g-lede">A grey coast between the tides — fog on the water, salt on the lens, and the long patience of slow weather.</div>
+          </div>
+          <div class="g-body">
+            <p class="g-intro">After the warm grey of Kyoto and the white glare of the salt, the coast offers a third kind of light — cold, slow, and patient. Here the tide does the composing, and the camera waits for the fog to decide what it will let you keep.</p>
+            <div class="g-blocks">
+              <div class="pb pb-full"><div class="im" style="background:linear-gradient(135deg,#3a4a50,#0f1518)"></div><div class="cap">The cape disappears, an hour at a time.</div></div>
+              <div class="pb pb-two"><div class="im" style="background:linear-gradient(135deg,#4a5259,#20282c)"></div><div class="im" style="background:linear-gradient(135deg,#5b6b72,#2c3a40)"></div></div>
+              <div class="pb pb-textrow"><div class="im" style="background:linear-gradient(135deg,#38484e,#151c1f)"></div><p class="ptext">The light works harder than you think — steady in the mist while everything else goes soft.</p></div>
+              <div class="pb pb-twotall"><div class="im" style="background:linear-gradient(160deg,#46565d,#141c20)"></div><div class="im" style="background:linear-gradient(160deg,#5a6a70,#1e262a)"></div></div>
+              <div class="pb pb-mosaic"><div class="im" style="background:linear-gradient(135deg,#3a4a50,#0f1518)"></div><div class="im" style="background:linear-gradient(135deg,#54646b,#222c30)"></div><div class="im" style="background:linear-gradient(135deg,#48585f,#161e22)"></div><div class="im" style="background:linear-gradient(135deg,#5e6e74,#26302f)"></div></div>
+              <div class="pb pb-carousel"><div class="im" style="background:linear-gradient(135deg,#46565d,#141c20)"></div><div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+              <div class="pb pb-quad"><div class="im" style="background:linear-gradient(135deg,#3f4f55,#10171a)"></div><div class="im" style="background:linear-gradient(135deg,#54646b,#222c30)"></div><div class="im" style="background:linear-gradient(135deg,#48585f,#161e22)"></div><div class="im" style="background:linear-gradient(135deg,#5e6e74,#26302f)"></div></div>
+            </div>
+            <div class="g-audio"><span class="pp">▶</span><span class="at">Surf at Cape Forchu</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // view switcher
+  document.querySelectorAll('.seg [role=tab]').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.seg [role=tab]').forEach(function(t){ t.setAttribute('aria-selected', t===tab); });
+      document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+      document.getElementById('view-' + tab.dataset.view).classList.add('active');
+    });
+  });
+
+  // theme toggle
+  var root = document.documentElement;
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if(!cur){ cur = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'; }
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // segmented + toggles demo interactivity
+  document.querySelectorAll('.segbar').forEach(function(bar){
+    bar.addEventListener('click', function(e){
+      if(e.target.tagName!=='BUTTON') return;
+      bar.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-selected', b===e.target); });
+    });
+  });
+  document.querySelectorAll('[data-toggle]').forEach(function(s){
+    s.addEventListener('click', function(){ s.classList.toggle('on'); });
+  });
+  document.querySelectorAll('.tinybtn:not(.del)').forEach(function(b){
+    b.addEventListener('click', function(){ b.classList.toggle('on'); });
+  });
+
+  // sign-in loading demo
+  var signin = document.getElementById('signin');
+  signin.addEventListener('click', function(){
+    signin.setAttribute('disabled','true'); signin.textContent = 'Signing in…';
+    document.getElementById('loginfoot').textContent = 'One moment…';
+    setTimeout(function(){ signin.textContent='Signed in ✓';
+      setTimeout(function(){ signin.removeAttribute('disabled'); signin.textContent='Sign in'; document.getElementById('loginfoot').textContent='Stays signed in for 30 days on this device.'; }, 1100);
+    }, 900);
+  });
+
+  // publish demo
+  function publishFlow(btn){
+    var orig = btn.textContent; btn.setAttribute('disabled','true'); btn.textContent='Publishing…';
+    setTimeout(function(){ btn.textContent='Published ✓ · building';
+      setTimeout(function(){ btn.removeAttribute('disabled'); btn.textContent=orig; }, 1600);
+    }, 1000);
+  }
+  document.getElementById('publishBtn').addEventListener('click', function(){ publishFlow(this); });
+  document.getElementById('publishBtn2').addEventListener('click', function(){ publishFlow(this); });
+
+  // build a little waveform
+  var wave = document.getElementById('wave');
+  if(wave){ var hs=[8,14,20,11,24,17,9,22,13,26,15,10,19,23,12,8,16,21,14,9,25,18,11,20,7,15,22,13,17,10];
+    hs.forEach(function(h){ var i=document.createElement('i'); i.style.height=h+'px'; wave.appendChild(i); }); }
+
+  // layout-picker rails: little diagram icons for each block
+  var GLYPH = {
+    single:'<rect x="7" y="3" width="10" height="10" rx="1" fill-opacity=".6"/>',
+    full:'<rect x="2" y="3" width="20" height="10" rx="1" fill-opacity=".6"/>',
+    two:'<rect x="2" y="3" width="9" height="10" rx="1" fill-opacity=".6"/><rect x="13" y="3" width="9" height="10" rx="1" fill-opacity=".6"/>',
+    twotall:'<rect x="4" y="1.5" width="6" height="13" rx="1" fill-opacity=".6"/><rect x="14" y="1.5" width="6" height="13" rx="1" fill-opacity=".6"/>',
+    'text-left':'<rect x="2" y="3" width="9" height="10" rx="1" fill-opacity=".6"/><line x1="14" y1="5" x2="22" y2="5"/><line x1="14" y1="8" x2="22" y2="8"/><line x1="14" y1="11" x2="19" y2="11"/>',
+    'text-right':'<line x1="2" y1="5" x2="10" y2="5"/><line x1="2" y1="8" x2="10" y2="8"/><line x1="2" y1="11" x2="7" y2="11"/><rect x="13" y="3" width="9" height="10" rx="1" fill-opacity=".6"/>',
+    quad:'<rect x="2" y="2.5" width="9" height="5" rx="1" fill-opacity=".6"/><rect x="13" y="2.5" width="9" height="5" rx="1" fill-opacity=".6"/><rect x="2" y="8.5" width="9" height="5" rx="1" fill-opacity=".6"/><rect x="13" y="8.5" width="9" height="5" rx="1" fill-opacity=".6"/>',
+    mosaic:'<rect x="2" y="3" width="11" height="10" rx="1" fill-opacity=".6"/><rect x="15" y="3" width="7" height="2.6" rx=".7" fill-opacity=".6"/><rect x="15" y="6.7" width="7" height="2.6" rx=".7" fill-opacity=".6"/><rect x="15" y="10.4" width="7" height="2.6" rx=".7" fill-opacity=".6"/>',
+    carousel:'<rect x="4" y="2" width="16" height="8" rx="1" fill-opacity=".6"/><circle cx="9" cy="13" r="1"/><circle cx="12" cy="13" r="1"/><circle cx="15" cy="13" r="1"/>'
+  };
+  var LABEL = { single:'Single', full:'Full width', two:'Two across', twotall:'Two tall', mosaic:'One big + three small', carousel:'Carousel — swipe', 'text-left':'Image left · text right', 'text-right':'Text left · image right', quad:'Four grid' };
+  var ORDER = ['single','full','two','twotall','mosaic','carousel','text-left','text-right','quad'];
+  document.querySelectorAll('[data-rail]').forEach(function(rail){
+    var active = rail.closest('.block').getAttribute('data-layout');
+    ORDER.forEach(function(k){
+      var b = document.createElement('button');
+      b.type='button'; b.title=LABEL[k]; b.setAttribute('aria-selected', k===active);
+      b.innerHTML = '<svg width="24" height="16" viewBox="0 0 24 16">'+GLYPH[k]+'</svg>';
+      b.addEventListener('click', function(){ rail.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-selected', x===b); }); });
+      rail.appendChild(b);
+    });
+  });
+</script>
