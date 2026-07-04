@@ -43,6 +43,10 @@ export default function Builder({ initial }: { initial?: Gallery }) {
       setStatus({ kind: 'err', msg: 'Title, slug and a cover photo are required.' });
       return;
     }
+    if (!gallery.date) {
+      setStatus({ kind: 'err', msg: 'Pick a date before publishing.' });
+      return;
+    }
     setIsSaving(true);
     setStatus({ kind: 'idle', msg: 'Publishing…' });
     try {
