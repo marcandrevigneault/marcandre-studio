@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   verifyPassword, createSessionCookie, clearSessionCookie,
-  isValidSession, SESSION_COOKIE_NAME,
+  isValidSession, sessionExpiry, SESSION_COOKIE_NAME,
 } from './auth';
 
 beforeEach(() => {
@@ -51,5 +51,15 @@ describe('auth', () => {
 
   it('clearSessionCookie expires the cookie', () => {
     expect(clearSessionCookie(true)).toMatch(/Max-Age=0|Expires=/);
+  });
+
+  it('sessionExpiry returns remaining seconds for valid sessions, null otherwise', () => {
+    const value = createSessionCookie(true).split(';')[0];
+    const remaining = sessionExpiry(value);
+    expect(remaining).not.toBeNull();
+    expect(remaining!).toBeGreaterThan(29 * 24 * 60 * 60);
+    expect(remaining!).toBeLessThanOrEqual(30 * 24 * 60 * 60);
+    expect(sessionExpiry(null)).toBeNull();
+    expect(sessionExpiry(`${SESSION_COOKIE_NAME}=garbage.sig`)).toBeNull();
   });
 });
