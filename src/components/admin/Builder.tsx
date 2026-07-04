@@ -5,7 +5,7 @@ import { saveGallery } from './api-client';
 import MetaFields from './MetaFields';
 import ThemeControls from './ThemeControls';
 import LivePreview from './LivePreview';
-import PhotoUploader from './PhotoUploader';
+import BlocksEditor from './BlocksEditor';
 import MusicPicker from './MusicPicker';
 
 export default function Builder({ initial }: { initial?: Gallery }) {
@@ -31,7 +31,12 @@ export default function Builder({ initial }: { initial?: Gallery }) {
       <div>
         <MetaFields value={gallery} onChange={setGallery} lockSlug={isEdit} />
         <ThemeControls value={gallery} onChange={setGallery} />
-        <PhotoUploader value={gallery} onChange={setGallery} />
+        <BlocksEditor
+          blocks={gallery.blocks}
+          cover={gallery.cover}
+          onChange={(blocks) => setGallery({ ...gallery, blocks })}
+          onCoverChange={(cover) => setGallery({ ...gallery, cover })}
+        />
         <MusicPicker value={gallery} onChange={setGallery} />
         <div style={{ marginTop: '1rem' }}>
           <button onClick={onSave}>{isEdit ? 'Save changes' : 'Publish'}</button>
