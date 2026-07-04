@@ -1,11 +1,20 @@
 import type { Gallery } from './types';
 
+function guard(res: Response) {
+  if (res.status === 401) {
+    window.location.href = '/admin/login';
+    throw new Error('session expired');
+  }
+}
+
 async function json<T>(res: Response): Promise<T> {
+  guard(res);
   if (!res.ok) throw new Error(`Request failed: ${res.status}`);
   return res.json() as Promise<T>;
 }
 
 async function text(res: Response): Promise<string> {
+  guard(res);
   if (!res.ok) throw new Error(`Request failed: ${res.status}`);
   return res.text();
 }

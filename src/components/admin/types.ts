@@ -23,3 +23,15 @@ export const emptyGallery = (): Gallery => ({
   theme: { font: 'serif', motion: 'calm', atmosphere: 'none' },
   blocks: [], body: '',
 });
+
+// The wire format (edit.astro's `initial`) carries no client-only ids. When we
+// load an existing gallery into the Builder, stamp a fresh `id` on every block
+// and image so React keys / drag-reorder / per-item edits have stable handles.
+export const withClientIds = (g: Gallery): Gallery => ({
+  ...g,
+  blocks: (g.blocks ?? []).map((b) => ({
+    ...b,
+    id: newId(),
+    images: (b.images ?? []).map((im) => ({ ...im, id: newId() })),
+  })),
+});

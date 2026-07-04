@@ -9,30 +9,45 @@ export default function Dashboard() {
   useEffect(() => { fetchGalleries().then(setGalleries).finally(() => setLoading(false)); }, []);
 
   async function onDelete(slug: string) {
-    if (!confirm(`Delete gallery "${slug}"? This commits a deletion.`)) return;
+    if (!window.confirm(`Delete gallery "${slug}"? This commits a deletion.`)) return;
     await deleteGallery(slug);
     setGalleries((gs) => gs.filter((g) => g.slug !== slug));
   }
 
-  if (loading) return <p>Loading…</p>;
   return (
-    <div>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Galleries</h1>
-        <a href="/admin/new" role="button" style={{ padding: '0.5rem 1rem', border: '1px solid #999', borderRadius: '4px', textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'inline-block' }}>+ New gallery</a>
-      </header>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {galleries.map((g) => (
-          <li key={g.slug} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '.5rem 0', borderBottom: '1px solid #eee' }}>
-            <span style={{ flex: 1 }}>{g.title || g.slug}</span>
-            {g.draft && <em>draft</em>}
-            {g.featured && <strong>★</strong>}
-            <a href={`/admin/${g.slug}/edit`}>Edit</a>
-            <button onClick={() => onDelete(g.slug)}>Delete</button>
-          </li>
-        ))}
-        {galleries.length === 0 && <li>No galleries yet. Create your first one.</li>}
-      </ul>
+    <div className="editor">
+      <div className="editor-inner">
+        <div className="topbar" style={{ border: 0, background: 'transparent', padding: '0 0 8px' }}>
+          <span className="wm">Studio<span className="dot">.</span></span>
+          <span className="crumb"><span className="sep">/</span> Galleries</span>
+          <span className="grow" />
+          <a className="btn" href="/admin/new">+ New gallery</a>
+        </div>
+
+        <div className="card">
+          <header><h3>Galleries</h3><span className="hint">edit, feature, or remove</span></header>
+          <div className="body">
+            {loading && <p style={{ color: 'var(--muted)', margin: 0 }}>Loading…</p>}
+            {!loading && galleries.length === 0 && (
+              <p style={{ color: 'var(--muted)', margin: 0 }}>No galleries yet. Create your first one.</p>
+            )}
+            {!loading && galleries.map((g) => (
+              <div key={g.slug} className="photo" style={{ gridTemplateColumns: '1fr auto auto' }}>
+                <div className="pmeta">
+                  <span style={{ fontSize: 15 }}>{g.title || g.slug}</span>
+                  <span className="slug" style={{ margin: 0 }}>
+                    <span className="chip mono">/photography/{g.slug}</span>
+                    {g.draft && <span className="chip">draft</span>}
+                    {g.featured && <span className="chip">★ featured</span>}
+                  </span>
+                </div>
+                <a className="btn ghost" href={`/admin/${g.slug}/edit`}>Edit</a>
+                <button type="button" className="tinybtn del" title="Delete" onClick={() => onDelete(g.slug)}>✕</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
