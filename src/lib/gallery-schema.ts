@@ -23,6 +23,27 @@ export const imageSchema = z.object({
   span: z.enum(['single', 'wide']).default('single'),
 });
 
+export const blockImageSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+  caption: z.string().optional(),
+});
+
+export const blockLayouts = [
+  'single', 'full', 'two', 'twotall', 'mosaic', 'carousel', 'image-text', 'quad',
+] as const;
+
+export const blockSchema = z.object({
+  layout: z.enum(blockLayouts),
+  images: z.array(blockImageSchema).default([]),
+  text: z.string().optional(),
+  align: z.enum(['left', 'right']).default('left'),
+});
+
+export type BlockLayout = (typeof blockLayouts)[number];
+export type BlockImage = z.infer<typeof blockImageSchema>;
+export type Block = z.infer<typeof blockSchema>;
+
 export const gallerySchema = z.object({
   title: z.string(),
   place: z.string().optional(),
@@ -33,7 +54,8 @@ export const gallerySchema = z.object({
   featured: z.boolean().default(false),
   theme: themeSchema,
   audio: audioSchema,
-  images: z.array(imageSchema).default([]),
+  images: z.array(imageSchema).default([]),   // LEGACY — retained for migration
+  blocks: z.array(blockSchema).default([]),   // NEW — canonical
 });
 
 export type GalleryFields = z.infer<typeof gallerySchema>;
