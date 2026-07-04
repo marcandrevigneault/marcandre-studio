@@ -43,14 +43,12 @@ export const POST: APIRoute = async ({ request }) => {
   const slots = { default: body };
 
   // Forward the incoming request so Astro.url/Astro.request resolve inside the
-  // container (without it, Astro.url is unset entirely). NOTE: this does NOT fully
-  // fix rendering — see the known-limitation note in the task report: this installed
-  // astro version's AstroContainer.create() ignores a passed `astroConfig.site`
-  // (verified by reading node_modules/astro/dist/container/index.js — `static create`
-  // never destructures `astroConfig` off `containerOptions`), so `Astro.site` stays
-  // undefined and BaseLayout's `new URL(Astro.url.pathname, Astro.site)` throws.
-  // That bug lives in BaseLayout.astro/astro's container API, both out of scope for
-  // this task (see report).
+  // container (without it, Astro.url is unset entirely). Note: this installed astro
+  // version's AstroContainer.create() ignores a passed `astroConfig.site` (verified by
+  // reading node_modules/astro/dist/container/index.js — `static create` never
+  // destructures `astroConfig` off `containerOptions`), so `Astro.site` stays undefined
+  // here. BaseLayout.astro now guards its canonical-URL computation for that case
+  // (see task-17-report.md, "Fix 17b"), so this no longer crashes the preview render.
   const container = await AstroContainer.create();
   const html = await container.renderToString(GalleryLayout, { props, slots, request });
 
