@@ -155,7 +155,7 @@ The nine available layouts are:
 | Full width | One photo, full bleed |
 | Two across | Two photos side by side |
 | Two tall | Two tall photos side by side |
-| Mosaic | One big photo plus three small ones |
+| One big + three small (mosaic) | One big photo plus three small ones |
 | Carousel | A swipeable strip of photos with dot indicators |
 | Image left · text right | One photo with a text block beside it |
 | Text left · image right | A text block with one photo beside it |

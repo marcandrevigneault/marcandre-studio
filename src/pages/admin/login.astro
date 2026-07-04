@@ -202,7 +202,18 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect('
         return;
       }
 
-      showError("That password didn't match.");
+      if (res.status === 401) {
+        showError("That password didn't match.");
+      } else {
+        let serverMessage: string | undefined;
+        try {
+          const body = await res.json();
+          if (body && typeof body.error === 'string') serverMessage = body.error;
+        } catch {
+          // response body wasn't JSON (or parsing failed) — fall back below
+        }
+        showError(serverMessage ?? `Something went wrong on the server (HTTP ${res.status}). Try again.`);
+      }
       signinBtn.disabled = false;
       signinBtn.textContent = 'Sign in';
     } catch {
