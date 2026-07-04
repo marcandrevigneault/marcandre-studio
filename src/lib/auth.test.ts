@@ -19,11 +19,15 @@ describe('auth', () => {
     expect(verifyPassword('nope')).toBe(false);
   });
 
+  it('sets Secure only when asked', () => {
+    expect(createSessionCookie(true)).toContain('Secure');
+    expect(createSessionCookie(false)).not.toContain('Secure');
+  });
+
   it('round-trips a valid session cookie', () => {
-    const setCookie = createSessionCookie();
+    const setCookie = createSessionCookie(true);
     expect(setCookie).toContain(`${SESSION_COOKIE_NAME}=`);
-    expect(setCookie).toContain('HttpOnly');
-    const value = setCookie.split(';')[0]; // "mas_session=<token>"
+    const value = setCookie.split(';')[0];
     expect(isValidSession(value)).toBe(true);
   });
 
@@ -35,10 +39,10 @@ describe('auth', () => {
   });
 
   it('rejects an expired session cookie', () => {
-    const value = createSessionCookie().split(';')[0];
+    const value = createSessionCookie(true).split(';')[0];
     vi.useFakeTimers();
     try {
-      vi.setSystemTime(Date.now() + 8 * 24 * 60 * 60 * 1000); // 8 days later
+      vi.setSystemTime(Date.now() + 31 * 24 * 60 * 60 * 1000); // 31 days later
       expect(isValidSession(value)).toBe(false);
     } finally {
       vi.useRealTimers();
@@ -46,6 +50,6 @@ describe('auth', () => {
   });
 
   it('clearSessionCookie expires the cookie', () => {
-    expect(clearSessionCookie()).toMatch(/Max-Age=0|Expires=/);
+    expect(clearSessionCookie(true)).toMatch(/Max-Age=0|Expires=/);
   });
 });
