@@ -3,6 +3,18 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import GalleryLayout from '../../layouts/GalleryLayout.astro';
 import { gallerySchema } from '../../lib/frontmatter';
 import globalCss from '../../styles/global.css?raw';
+import galleryCss from '../../styles/gallery.css?raw';
+
+// Preview-only chrome removal: the iframe should show the gallery itself,
+// not the site nav/footer around it (they'd also be unstyled here, since
+// their component-scoped styles don't survive the container render).
+// Also force reveal-animated elements visible: motion.js is a bundled asset
+// whose <script src> doesn't resolve inside the container-rendered document,
+// so without this the hero/blocks would sit at opacity 0 forever.
+const previewCss = [
+  '.site-nav, .site-footer { display: none; }',
+  '[data-reveal] { opacity: 1 !important; transform: none !important; }',
+].join('\n');
 
 export const prerender = false;
 
@@ -54,13 +66,13 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Astro's Container API renderToString returns a full <html> document (because
   // GalleryLayout wraps BaseLayout which renders the full HTML shell), but it does
-  // NOT inline the bundled global.css — the stylesheet import in BaseLayout becomes
-  // a <link> to a build-time asset that doesn't exist in the preview context.
-  // We inject global.css as an inline <style> so the preview is fully styled with
-  // all design tokens, font moods, atmosphere rules, and per-gallery CSS variables.
+  // NOT inline any bundled stylesheet — imports become <link>s to build-time assets
+  // that don't exist in the preview context. Inline everything the gallery needs:
+  // global tokens + the gallery layout/blocks styles + preview chrome removal.
+  const inline = `<style>${globalCss}\n${galleryCss}\n${previewCss}</style>`;
   const styled = html.includes('</head>')
-    ? html.replace('</head>', `<style>${globalCss}</style></head>`)
-    : `<style>${globalCss}</style>` + html;
+    ? html.replace('</head>', `${inline}</head>`)
+    : inline + html;
 
   return new Response(styled, { status: 200, headers: { 'content-type': 'text/html' } });
 };

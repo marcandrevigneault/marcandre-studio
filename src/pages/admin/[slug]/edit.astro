@@ -9,10 +9,8 @@ if (!gallery) return Astro.redirect('/admin');
 // Serialize Date -> string for the client component.
 const initial = { ...gallery, date: new Date(gallery.date).toISOString().slice(0, 10) };
 ---
-<BaseLayout title={`Studio — Edit ${gallery.slug}`}>
+<BaseLayout title={`Studio — Edit ${gallery.slug}`} bareNav={true} bareFooter={true}>
   <div class="admin-scope">
-    <main style="max-width:80rem;margin:0 auto;padding:2rem 1rem;">
-      <AdminApp view="builder" initial={initial} client:only="react" />
-    </main>
+    <AdminApp view="builder" initial={initial} client:only="react" />
   </div>
 </BaseLayout>

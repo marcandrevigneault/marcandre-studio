@@ -1,0 +1,111 @@
+/* =========================================================================
+   Gallery page styles — GalleryLayout + GalleryBlocks.
+   Lives as a plain stylesheet (not component-scoped <style>) so the admin
+   live preview (/api/preview) can inline it verbatim: the Astro container
+   render drops component-scoped styles, which left the preview unstyled.
+   Imported by GalleryLayout.astro for the real site build.
+   ========================================================================= */
+
+/* ---- GalleryLayout ---- */
+.gallery { min-height: 100vh; }
+
+.gallery .hero {
+  position: relative;
+  min-height: min(86vh, 760px);
+  display: flex;
+  align-items: flex-end;
+  padding-block: clamp(3rem, 10vw, 7rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+.gallery .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--cover);
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.05);
+}
+.gallery .scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--paper) 92%, transparent) 0%,
+    color-mix(in oklab, var(--paper) 55%, transparent) 35%,
+    transparent 75%
+  );
+}
+.gallery .hero-inner { width: min(100% - 2 * var(--pad), 1200px); }
+.gallery .lede {
+  margin-inline: 0;
+  font-size: clamp(1.05rem, 1rem + 0.5vw, 1.35rem);
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.gallery .body { padding-top: clamp(2rem, 6vw, 4rem); }
+.gallery .body .intro {
+  width: min(100% - 2 * var(--pad), var(--measure));
+  margin: 0 auto clamp(2rem, 6vw, 4rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.6rem);
+  line-height: 1.5;
+}
+
+.gallery .back {
+  padding-block: clamp(2rem, 6vw, 3.5rem);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+.gallery .back a { color: var(--muted); }
+.gallery .back a:hover { color: var(--accent); }
+
+/* ---- GalleryBlocks ---- */
+.blocks { display: flex; flex-direction: column; gap: clamp(1.5rem, 5vw, 3.5rem); }
+.blocks .block { display: grid; gap: var(--gap); }
+.blocks .cell { margin: 0; }
+.blocks .open { display: block; width: 100%; padding: 0; border: 0; background: color-mix(in oklab, var(--ink) 6%, transparent); cursor: zoom-in; overflow: hidden; border-radius: var(--radius); }
+.blocks .open img { width: 100%; transition: transform .9s var(--ease); }
+.blocks .open:hover img { transform: scale(1.03); }
+.blocks figcaption { margin-top: .55rem; font-family: var(--font-sans); font-size: .78rem; color: var(--muted); }
+
+/* layouts */
+.blocks .l-single { grid-template-columns: minmax(0, var(--measure)); justify-content: center; }
+.blocks .l-full { grid-template-columns: 1fr; }
+.blocks .l-two, .blocks .l-twotall { grid-template-columns: 1fr 1fr; }
+.blocks .l-quad { grid-template-columns: 1fr 1fr; }
+.blocks .l-mosaic { grid-template-columns: 1.7fr 1fr; grid-auto-rows: 1fr; }
+.blocks .l-mosaic .cell:first-child { grid-row: 1 / span 3; }
+.blocks .l-image-text { grid-template-columns: 1fr 1fr; align-items: center; }
+.blocks .l-image-text.rtl { direction: rtl; }
+.blocks .l-image-text .prose { direction: ltr; font-family: var(--font-display); font-size: clamp(1.05rem, 1rem + .4vw, 1.35rem); line-height: 1.5; }
+@media (max-width: 700px) {
+  .blocks .l-two, .blocks .l-twotall, .blocks .l-quad, .blocks .l-mosaic, .blocks .l-image-text { grid-template-columns: 1fr; }
+  .blocks .l-mosaic .cell:first-child { grid-row: auto; }
+}
+
+/* lightbox */
+.lightbox { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100%; height: 100%; margin: 0; overflow: hidden; }
+.lightbox::backdrop { background: color-mix(in oklab, #000 88%, transparent); backdrop-filter: blur(6px); }
+.lightbox figure { margin: 0; height: 100%; display: grid; place-content: center; gap: .75rem; padding: clamp(1rem, 5vw, 3rem); }
+.lightbox img { max-width: min(92vw, 1400px); max-height: 82vh; width: auto; border-radius: var(--radius); }
+.lightbox figcaption { text-align: center; color: rgba(255, 255, 255, .8); font-family: var(--font-sans); font-size: .85rem; }
+.lightbox .close { position: fixed; top: 1rem; right: 1.25rem; width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .3); background: rgba(0, 0, 0, .3); color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer; }
+
+/* carousel */
+.blocks .carousel { position: relative; }
+.blocks .carousel .track { display: flex; gap: var(--gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.blocks .carousel .track::-webkit-scrollbar { display: none; }
+.blocks .carousel .slide { flex: 0 0 100%; margin: 0; scroll-snap-align: center; }
+.blocks .carousel .c-prev, .blocks .carousel .c-next { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent); background: color-mix(in oklab, var(--paper) 70%, transparent); color: var(--ink); cursor: pointer; font-size: 1.4rem; line-height: 1; }
+.blocks .carousel .c-prev { left: .75rem; }
+.blocks .carousel .c-next { right: .75rem; }
+.blocks .carousel .dots { display: flex; gap: .4rem; justify-content: center; margin-top: .75rem; }
+.blocks .carousel .dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 999px; background: color-mix(in oklab, var(--ink) 25%, transparent); cursor: pointer; transition: width .2s var(--ease), background .2s var(--ease); }
+.blocks .carousel .dot.on { width: 18px; background: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .blocks .carousel .track { scroll-behavior: auto; } }

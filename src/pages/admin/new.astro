@@ -4,10 +4,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AdminApp from '../../components/admin/AdminApp';
 import '../../components/admin/admin.css';
 ---
-<BaseLayout title="Studio — New gallery">
+<BaseLayout title="Studio — New gallery" bareNav={true} bareFooter={true}>
   <div class="admin-scope">
-    <main style="max-width:80rem;margin:0 auto;padding:2rem 1rem;">
-      <AdminApp view="builder" client:only="react" />
-    </main>
+    <AdminApp view="builder" client:only="react" />
   </div>
 </BaseLayout>
