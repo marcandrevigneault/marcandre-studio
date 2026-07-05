@@ -5,7 +5,9 @@ import AdminApp from '../../components/admin/AdminApp';
 import '../../components/admin/admin.css';
 ---
 <BaseLayout title="Studio — Galleries">
-  <main style="max-width:60rem;margin:2rem auto;">
-    <AdminApp view="dashboard" client:only="react" />
-  </main>
+  <div class="admin-scope">
+    <main style="max-width:60rem;margin:0 auto;padding:2rem 1rem;">
+      <AdminApp view="dashboard" client:only="react" />
+    </main>
+  </div>
 </BaseLayout>

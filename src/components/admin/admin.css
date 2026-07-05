@@ -19,7 +19,11 @@
      `.tinybtn`, which the block editor's cover/remove buttons still use.
    ============================================================ */
 
-:root {
+/* Tokens are scoped to .admin-scope — NOT :root — so they never fight
+   global.css's :root tokens on the same page. (Unscoped, the shared names
+   resolved from global.css while admin-only names followed this file's dark
+   media query, producing an unreadable half-light/half-dark admin.) */
+.admin-scope {
   /* light (paper) — the studio's daylight identity */
   --paper:   #fbfaf7;
   --surface: #ffffff;
@@ -40,10 +44,16 @@
 
   --radius: 3px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* the admin's own ground, independent of the (light) public body */
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  .admin-scope {
     --paper:   #16140f;
     --surface: #1e1b15;
     --sunk:    #14120d;
@@ -58,22 +68,9 @@
     --shadow:  0 1px 2px rgba(0,0,0,.3), 0 12px 40px -14px rgba(0,0,0,.6);
   }
 }
-/* viewer toggle wins over OS in both directions */
-:root[data-theme="dark"] {
-  --paper:#16140f; --surface:#1e1b15; --sunk:#14120d; --ink:#ece7dd;
-  --muted:#a49c8f; --faint:#79726650; --line:#322d24; --accent:#c99a76;
-  --accent-ink:#16140f; --good:#8fb78f; --warn:#d6a25f;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 40px -14px rgba(0,0,0,.6);
-}
-:root[data-theme="light"] {
-  --paper:#fbfaf7; --surface:#ffffff; --sunk:#f4f1ea; --ink:#1a1916;
-  --muted:#6f6b63; --faint:#9a958c; --line:#e7e3da; --accent:#9a6b4f;
-  --accent-ink:#ffffff; --good:#4f7a55; --warn:#b0742a;
-  --shadow:0 1px 2px rgba(26,25,22,.04), 0 8px 30px -12px rgba(26,25,22,.18);
-}
 
-input, button, select, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; }
+.admin-scope input, .admin-scope button, .admin-scope select, .admin-scope textarea { font: inherit; color: inherit; }
+.admin-scope button { cursor: pointer; }
 
 .eyebrow {
   font-size: 10.5px; font-weight: 600; letter-spacing: .22em;
