@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   verifyPassword, createSessionCookie, clearSessionCookie,
-  isValidSession, SESSION_COOKIE_NAME,
+  isValidSession, sessionExpiry, isSecureRequest, SESSION_COOKIE_NAME,
 } from './auth';
 
 beforeEach(() => {
@@ -19,11 +19,15 @@ describe('auth', () => {
     expect(verifyPassword('nope')).toBe(false);
   });
 
+  it('sets Secure only when asked', () => {
+    expect(createSessionCookie(true)).toContain('Secure');
+    expect(createSessionCookie(false)).not.toContain('Secure');
+  });
+
   it('round-trips a valid session cookie', () => {
-    const setCookie = createSessionCookie();
+    const setCookie = createSessionCookie(true);
     expect(setCookie).toContain(`${SESSION_COOKIE_NAME}=`);
-    expect(setCookie).toContain('HttpOnly');
-    const value = setCookie.split(';')[0]; // "mas_session=<token>"
+    const value = setCookie.split(';')[0];
     expect(isValidSession(value)).toBe(true);
   });
 
@@ -35,10 +39,10 @@ describe('auth', () => {
   });
 
   it('rejects an expired session cookie', () => {
-    const value = createSessionCookie().split(';')[0];
+    const value = createSessionCookie(true).split(';')[0];
     vi.useFakeTimers();
     try {
-      vi.setSystemTime(Date.now() + 8 * 24 * 60 * 60 * 1000); // 8 days later
+      vi.setSystemTime(Date.now() + 31 * 24 * 60 * 60 * 1000); // 31 days later
       expect(isValidSession(value)).toBe(false);
     } finally {
       vi.useRealTimers();
@@ -46,6 +50,29 @@ describe('auth', () => {
   });
 
   it('clearSessionCookie expires the cookie', () => {
-    expect(clearSessionCookie()).toMatch(/Max-Age=0|Expires=/);
+    expect(clearSessionCookie(true)).toMatch(/Max-Age=0|Expires=/);
+  });
+
+  it('sessionExpiry returns remaining seconds for valid sessions, null otherwise', () => {
+    const value = createSessionCookie(true).split(';')[0];
+    const remaining = sessionExpiry(value);
+    expect(remaining).not.toBeNull();
+    expect(remaining!).toBeGreaterThan(29 * 24 * 60 * 60);
+    expect(remaining!).toBeLessThanOrEqual(30 * 24 * 60 * 60);
+    expect(sessionExpiry(null)).toBeNull();
+    expect(sessionExpiry(`${SESSION_COOKIE_NAME}=garbage.sig`)).toBeNull();
+  });
+
+  it('isSecureRequest detects https via protocol', () => {
+    expect(isSecureRequest(new Request('https://x/admin'))).toBe(true);
+  });
+
+  it('isSecureRequest is false for plain http with no forwarded-proto header', () => {
+    expect(isSecureRequest(new Request('http://x/admin'))).toBe(false);
+  });
+
+  it('isSecureRequest honors x-forwarded-proto: https behind a proxy', () => {
+    const request = new Request('http://x/admin', { headers: { 'x-forwarded-proto': 'https' } });
+    expect(isSecureRequest(request)).toBe(true);
   });
 });

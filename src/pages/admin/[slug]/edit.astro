@@ -2,6 +2,7 @@
 export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import AdminApp from '../../../components/admin/AdminApp';
+import '../../../components/admin/admin.css';
 import { getGallery } from '../../../lib/github';
 const gallery = await getGallery(Astro.params.slug!);
 if (!gallery) return Astro.redirect('/admin');

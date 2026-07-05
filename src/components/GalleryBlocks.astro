@@ -1,0 +1,141 @@
+---
+import type { Block } from '../lib/gallery-schema';
+interface Props { blocks: Block[]; }
+const { blocks } = Astro.props;
+---
+<div class="blocks">
+  {blocks.map((b, i) => (
+    <section class:list={['block', `l-${b.layout}`, { rtl: b.layout === 'image-text' && b.align === 'right' }]} data-reveal={String(i % 6)}>
+      {b.layout === 'image-text' && b.text && (
+        <div class="prose"><p>{b.text}</p></div>
+      )}
+      {b.layout === 'carousel' ? (
+        <div class="carousel" data-carousel>
+          <div class="track">
+            {b.images.map((img) => (
+              <figure class="slide">
+                <button class="open" data-full={img.src} data-cap={img.caption ?? img.alt} aria-label={`View ${img.alt}`}>
+                  <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+                </button>
+              </figure>
+            ))}
+          </div>
+          <button class="c-prev" data-prev aria-label="Previous">‹</button>
+          <button class="c-next" data-next aria-label="Next">›</button>
+          <div class="dots" data-dots>
+            {b.images.map((_, di) => (<button class="dot" data-goto={String(di)} aria-label={`Slide ${di + 1}`}></button>))}
+          </div>
+        </div>
+      ) : (
+        b.images.map((img) => (
+          <figure class="cell">
+            <button class="open" data-full={img.src} data-cap={img.caption ?? img.alt} aria-label={`View ${img.alt}`}>
+              <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+            </button>
+            {img.caption && <figcaption>{img.caption}</figcaption>}
+          </figure>
+        ))
+      )}
+    </section>
+  ))}
+</div>
+
+<!-- Lightbox (ported from PhotoGrid.astro) -->
+<dialog class="lightbox" data-lightbox>
+  <button class="close" aria-label="Close" data-close>&times;</button>
+  <figure><img alt="" data-lightbox-img /><figcaption data-lightbox-cap></figcaption></figure>
+</dialog>
+
+<style>
+  .blocks { display: flex; flex-direction: column; gap: clamp(1.5rem, 5vw, 3.5rem); }
+  .block { display: grid; gap: var(--gap); }
+  .cell { margin: 0; }
+  .open { display:block; width:100%; padding:0; border:0; background: color-mix(in oklab, var(--ink) 6%, transparent); cursor: zoom-in; overflow: hidden; border-radius: var(--radius); }
+  .open img { width:100%; transition: transform .9s var(--ease); }
+  .open:hover img { transform: scale(1.03); }
+  figcaption { margin-top: .55rem; font-family: var(--font-sans); font-size: .78rem; color: var(--muted); }
+
+  /* layouts */
+  .l-single { grid-template-columns: minmax(0, var(--measure)); justify-content: center; }
+  .l-full { grid-template-columns: 1fr; }
+  .l-two, .l-twotall { grid-template-columns: 1fr 1fr; }
+  .l-quad { grid-template-columns: 1fr 1fr; }
+  .l-mosaic { grid-template-columns: 1.7fr 1fr; grid-auto-rows: 1fr; }
+  .l-mosaic .cell:first-child { grid-row: 1 / span 3; }
+  .l-image-text { grid-template-columns: 1fr 1fr; align-items: center; }
+  .l-image-text.rtl { direction: rtl; }
+  .l-image-text .prose { direction: ltr; font-family: var(--font-display); font-size: clamp(1.05rem, 1rem + .4vw, 1.35rem); line-height: 1.5; }
+  @media (max-width: 700px) {
+    .l-two, .l-twotall, .l-quad, .l-mosaic, .l-image-text { grid-template-columns: 1fr; }
+    .l-mosaic .cell:first-child { grid-row: auto; }
+  }
+
+  /* lightbox — ported from PhotoGrid.astro */
+  .lightbox { border:0; padding:0; background:transparent; max-width:100vw; max-height:100vh; width:100%; height:100%; margin:0; overflow:hidden; }
+  .lightbox::backdrop { background: color-mix(in oklab, #000 88%, transparent); backdrop-filter: blur(6px); }
+  .lightbox figure { margin:0; height:100%; display:grid; place-content:center; gap:.75rem; padding: clamp(1rem,5vw,3rem); }
+  .lightbox img { max-width:min(92vw,1400px); max-height:82vh; width:auto; border-radius: var(--radius); }
+  .lightbox figcaption { text-align:center; color: rgba(255,255,255,.8); font-family: var(--font-sans); font-size:.85rem; }
+  .close { position:fixed; top:1rem; right:1.25rem; width:44px; height:44px; border-radius:999px; border:1px solid rgba(255,255,255,.3); background: rgba(0,0,0,.3); color:#fff; font-size:1.6rem; line-height:1; cursor:pointer; }
+
+  /* carousel */
+  .carousel { position: relative; }
+  .carousel .track { display: flex; gap: var(--gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .carousel .track::-webkit-scrollbar { display: none; }
+  .carousel .slide { flex: 0 0 100%; margin: 0; scroll-snap-align: center; }
+  .carousel .c-prev, .carousel .c-next { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent); background: color-mix(in oklab, var(--paper) 70%, transparent); color: var(--ink); cursor: pointer; font-size: 1.4rem; line-height: 1; }
+  .carousel .c-prev { left: .75rem; } .carousel .c-next { right: .75rem; }
+  .carousel .dots { display: flex; gap: .4rem; justify-content: center; margin-top: .75rem; }
+  .carousel .dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 999px; background: color-mix(in oklab, var(--ink) 25%, transparent); cursor: pointer; transition: width .2s var(--ease), background .2s var(--ease); }
+  .carousel .dot.on { width: 18px; background: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .carousel .track { scroll-behavior: auto; } }
+</style>
+
+<script>
+  const dialog = document.querySelector('[data-lightbox]') as HTMLDialogElement | null;
+  if (dialog) {
+    const img = dialog.querySelector('[data-lightbox-img]') as HTMLImageElement;
+    const cap = dialog.querySelector('[data-lightbox-cap]') as HTMLElement;
+    document.querySelectorAll('.open').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLElement;
+        img.src = el.dataset.full || '';
+        img.alt = el.dataset.cap || '';
+        cap.textContent = el.dataset.cap || '';
+        dialog.showModal();
+      });
+    });
+    const close = () => dialog.close();
+    dialog.querySelector('[data-close]')?.addEventListener('click', close);
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
+  }
+
+  document.querySelectorAll('[data-carousel]').forEach((root) => {
+    const track = root.querySelector('.track') as HTMLElement;
+    const slides = Array.from(root.querySelectorAll('.slide')) as HTMLElement[];
+    const dots = Array.from(root.querySelectorAll('.dot')) as HTMLElement[];
+    if (dots[0]) dots[0].classList.add('on');
+    const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const to = (i: number) => slides[i]?.scrollIntoView({ behavior: prefersReduced.matches ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+    root.querySelector('[data-prev]')?.addEventListener('click', () => to(Math.max(0, active() - 1)));
+    root.querySelector('[data-next]')?.addEventListener('click', () => to(Math.min(slides.length - 1, active() + 1)));
+    dots.forEach((d) => d.addEventListener('click', () => to(Number(d.dataset.goto))));
+    function active() {
+      let best = 0, bestDist = Infinity;
+      slides.forEach((s, i) => {
+        const d = Math.abs(s.offsetLeft - track.scrollLeft);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      return best;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          const i = slides.indexOf(e.target as HTMLElement);
+          dots.forEach((d, di) => d.classList.toggle('on', di === i));
+        }
+      });
+    }, { root: track, threshold: 0.6 });
+    slides.forEach((s) => io.observe(s));
+  });
+</script>

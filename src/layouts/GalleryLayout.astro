@@ -1,7 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import AmbientAudio from '../components/AmbientAudio.astro';
-import PhotoGrid from '../components/PhotoGrid.astro';
+import GalleryBlocks from '../components/GalleryBlocks.astro';
+import { normalizeToBlocks } from '../lib/blocks';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -23,7 +24,8 @@ const styleAttr = Object.entries(vars)
   .map(([k, v]) => `${k}:${v}`)
   .join(';');
 
-const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+const validDate = data.date instanceof Date && !isNaN(data.date.getTime());
+const dateText = validDate ? data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Draft — no date yet';
 ---
 
 <BaseLayout title={data.title} description={data.summary}>
@@ -45,7 +47,7 @@ const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month:
 
     <div class="body wrap">
       <slot />
-      {data.images.length > 0 && <PhotoGrid images={data.images} />}
+      {(() => { const blocks = normalizeToBlocks(data); return blocks.length > 0 && <GalleryBlocks blocks={blocks} />; })()}
     </div>
 
     <p class="back wrap">

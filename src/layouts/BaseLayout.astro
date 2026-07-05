@@ -14,7 +14,11 @@ interface Props {
 const { title, description = 'Photography, science, and other passions by Marc-André Vigneault.', bareNav = false } = Astro.props;
 const siteName = 'Marc-André Vigneault';
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+// Astro.site is undefined when this layout is rendered via experimental_AstroContainer
+// (e.g. the admin live preview at /api/preview) — the installed astro version never
+// honors a passed astroConfig.site there. Guard so preview rendering doesn't 500;
+// canonical/og:url are simply omitted when there's no site to build them from.
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
@@ -25,11 +29,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <!-- Swap the .no-js class as early as possible so reveal styles can apply. -->

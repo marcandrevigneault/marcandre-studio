@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { clearSessionCookie } from '../../../lib/auth';
+import { clearSessionCookie, isSecureRequest } from '../../../lib/auth';
 
 export const prerender = false;
 
-export const POST: APIRoute = async () =>
+export const POST: APIRoute = async ({ request }) =>
   new Response(JSON.stringify({ ok: true }), {
     status: 200,
-    headers: { 'content-type': 'application/json', 'set-cookie': clearSessionCookie() },
+    headers: { 'content-type': 'application/json', 'set-cookie': clearSessionCookie(isSecureRequest(request)) },
   });

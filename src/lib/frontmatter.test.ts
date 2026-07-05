@@ -53,4 +53,28 @@ describe('frontmatter', () => {
       title: 't', date: '2026-01-01', summary: 's', cover: 'c', ...bad,
     })).toThrow();
   });
+
+  it('round-trips a gallery with blocks and omits empty legacy images', () => {
+    const g = parseGallery('t', `---
+title: T
+date: 2026-01-01
+summary: s
+cover: c
+blocks:
+  - layout: two
+    align: left
+    images:
+      - src: a
+        alt: A
+      - src: b
+        alt: B
+---
+`);
+    const md = serializeGallery(g);
+    expect(md).toContain('blocks:');
+    expect(md).not.toMatch(/^images:/m);
+    const g2 = parseGallery('t', md);
+    expect(g2.blocks).toHaveLength(1);
+    expect(g2.blocks[0].images).toHaveLength(2);
+  });
 });
