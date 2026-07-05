@@ -7,7 +7,15 @@
    ========================================================================= */
 
 /* ---- GalleryLayout ---- */
-.gallery { min-height: 100vh; }
+/* The gallery paints its own world: background/color come from the
+   per-gallery CSS variables set inline on the <article>. Without this,
+   the body's (light) ground and inherited ink bleed through — on a
+   dark-themed gallery the hero title rendered near-black on black. */
+.gallery {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}
 
 .gallery .hero {
   position: relative;
