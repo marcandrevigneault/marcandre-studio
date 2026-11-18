@@ -8,3 +8,5 @@ const call=(data:any,extra:Record<string,string>={},host='marcandre-studio.verce
 it('records only validated public page events without excess fields',async()=>{const data=event();expect((await call({...data,ip:'unwanted',query:'secret'})).status).toBe(204);expect(service.adminService).toHaveBeenCalledWith('/events',data);});
 it('excludes admins, bots and preview traffic',async()=>{service.currentSession.mockResolvedValueOnce(true);await call(event());await call(event(),{'user-agent':'Googlebot'});await call(event(),{},'preview.vercel.app');expect(service.adminService).not.toHaveBeenCalled();});
 it('rejects foreign origins and private or query-containing paths',async()=>{expect((await call(event(),{origin:'https://evil.test'})).status).toBe(403);expect((await call({...event(),path:'/admin/'})).status).toBe(400);expect((await call({...event(),path:'/about/?secret=x'})).status).toBe(400);expect(service.adminService).not.toHaveBeenCalled();});
+
+it('records visits on the mytinylab production domain',async()=>{expect((await call(event(),{},'mytinylab.vercel.app')).status).toBe(204);expect(service.adminService).toHaveBeenCalledTimes(1);});

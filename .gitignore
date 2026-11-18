@@ -20,3 +20,7 @@ public/tools/video-qr/
 # Cloudflare local state
 .wrangler/
 .dev.vars*
+
+# Browser test reports
+playwright-report/
+test-results/

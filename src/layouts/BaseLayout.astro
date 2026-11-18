@@ -16,7 +16,7 @@ interface Props {
 }
 
 const { title, titleEn = title, description = 'Photographie, art, projets et science par Marc-André Vigneault.', descriptionEn = 'Photography, art, projects, and science by Marc-André Vigneault.', bareNav = false, bareFooter = false } = Astro.props;
-const siteName = 'Marc-André Vigneault';
+const siteName = 'mytinylab';
 const fullTitleEn = titleEn === siteName ? titleEn : `${titleEn} — ${siteName}`;
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 // Astro.site is undefined when this layout is rendered via experimental_AstroContainer

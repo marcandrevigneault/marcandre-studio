@@ -1,7 +1,7 @@
 // Session-only measurement: no cookie, fingerprint, query string or referrer is sent.
 // A visit is a tab session with less than 30 minutes of inactivity.
 async function measure() {
-  if (location.hostname !== 'marcandre-studio.vercel.app' || location.pathname.startsWith('/admin') || navigator.doNotTrack === '1' || (navigator as any).globalPrivacyControl) return;
+  if (!['mytinylab.vercel.app','marcandre-studio.vercel.app'].includes(location.hostname) || location.pathname.startsWith('/admin') || navigator.doNotTrack === '1' || (navigator as any).globalPrivacyControl) return;
   try {
     const response=await fetch('/api/auth/session',{cache:'no-store'});
     if(!response.ok||(await response.json()).authenticated)return;

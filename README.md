@@ -136,3 +136,23 @@ For one-time setup instructions (GitHub, Vercel, Cloudinary, env vars), see
 Video, Poetry, and Travel are scaffolded as "coming soon" on the homepage. Each can reuse
 the same content-collection pattern (a new collection in `content.config.ts` + a layout) —
 e.g. Poetry as quiet typographic pages, Travel as galleries with maps.
+
+### Frontend and phone checks
+
+Install browser engines once: `npx playwright install chromium webkit`.
+
+- `npm run test:frontend`: desktop Chromium, iPhone/WebKit and Android/Chromium.
+- `npm run test:phones`: the two phone profiles only.
+- `npm run test:frontend:ui`: interactive browser-test UI with device projects.
+- `npx playwright show-report`: view results and attached menu screenshots.
+
+The suite starts the local Astro server automatically. It covers a compact
+header, touch-sized menu control, open/close/navigation, keyboard and Escape,
+outside dismissal, French/English labels, narrow/landscape layouts, disabled
+sections, anonymous admin visibility, and a JavaScript-disabled fallback.
+Phone profiles emulate viewport, touch and browser behavior; they are not tests
+on physical iOS/Android devices. GitHub Actions runs the same checks for main
+and pull requests, retaining screenshots/traces and the HTML report.
+
+The public site address is https://mytinylab.vercel.app. Both production hostnames
+remain accepted by visit measurement; canonical links use the mytinylab address.

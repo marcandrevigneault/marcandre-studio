@@ -7,7 +7,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 export default defineConfig({
-  site: 'https://marcandre.studio',
+  site: 'https://mytinylab.vercel.app',
   output: 'static',
   adapter: vercel(),
   integrations: [mdx(), sitemap(), react()],
