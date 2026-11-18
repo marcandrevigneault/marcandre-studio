@@ -32,3 +32,31 @@ describe('private admin data service',()=>{
     expect((await (await call('/attempt',{key:'a'.repeat(64)})).json()).allowed).toBe(false);
   });
 });
+
+describe('private page drafts SQL CAS',()=>{
+ const document={version:1,blocks:[{id:'hero',type:'hero'}]};
+ it('inserts once, updates only the exact revision and deletes only the exact revision',async()=>{
+  const r1=crypto.randomUUID(),r2=crypto.randomUUID();const initial={document,baseSha:null,expectedRevision:null,revision:r1};
+  expect(await (await call('/page-drafts/home')).json()).toEqual({draft:null});
+  expect((await call('/page-drafts/home',initial,'PUT')).status).toBe(200);
+  expect((await call('/page-drafts/home',{...initial,revision:r2},'PUT')).status).toBe(409);
+  expect((await call('/page-drafts/home',{...initial,expectedRevision:r2,revision:crypto.randomUUID()},'PUT')).status).toBe(409);
+  expect((await call('/page-drafts/home',{...initial,expectedRevision:r1,revision:r2,baseSha:'a'.repeat(40)},'PUT')).status).toBe(200);
+  expect((await call('/page-drafts/home',{expectedRevision:r1},'DELETE')).status).toBe(409);
+  expect(await (await call('/page-drafts/home')).json()).toEqual({draft:{document,baseSha:'a'.repeat(40),revision:r2}});
+  expect((await call('/page-drafts/home',{expectedRevision:r2},'DELETE')).status).toBe(200);
+  expect(await (await call('/page-drafts/home')).json()).toEqual({draft:null});
+ });
+ it('restricts ids, credentials, revision fields and coarse document shape',async()=>{
+  expect((await worker.fetch(new Request('https://worker/page-drafts/home'),env)).status).toBe(401);
+  expect((await call('/page-drafts/nope')).status).toBe(404);
+  const valid={document,baseSha:null,expectedRevision:null,revision:crypto.randomUUID()};
+  for(const patch of [{baseSha:'bad'},{revision:'bad'},{revision:[valid.revision]},{expectedRevision:[valid.revision]},{expectedRevision:valid.revision},{expectedRevision:'bad'},{document:{}},{document:{version:2,blocks:[]}}])expect((await call('/page-drafts/home',{...valid,...patch},'PUT')).status).toBe(400);
+ });
+ it('raises the body limit only for drafts',async()=>{
+  const large={document:{version:1,blocks:[{id:'a',type:'text',text:{fr:'a'.repeat(5000),en:''}}]},baseSha:null,expectedRevision:null,revision:crypto.randomUUID()};
+  expect((await call('/page-drafts/about',large,'PUT')).status).toBe(200);
+  expect((await call('/events',large)).status).toBe(413);
+  large.document.blocks[0].text.fr='a'.repeat(300000);expect((await call('/page-drafts/about',large,'PUT')).status).toBe(413);
+ });
+});

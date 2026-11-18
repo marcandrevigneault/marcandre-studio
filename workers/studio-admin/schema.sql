@@ -4,3 +4,4 @@ CREATE INDEX IF NOT EXISTS events_day ON events(day);
 CREATE TABLE IF NOT EXISTS attempts (key TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(key,bucket));
 CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 INSERT OR IGNORE INTO metadata VALUES ('startedAt', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+CREATE TABLE IF NOT EXISTS page_drafts (page TEXT PRIMARY KEY, content TEXT NOT NULL, revision TEXT NOT NULL);

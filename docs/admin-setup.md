@@ -307,3 +307,32 @@ The dashboard displays unavailable errors separately from zero traffic.
 Run `npm test` for credential/revision/API/SQLite tests, and `npx astro build` for
 the site. For isolated browser checks, use local Wrangler/D1 with a test secret;
 never rotate the live owner's password or seed fake production visits for tests.
+
+## Inline page builder
+
+Home (`/`), Projects (`/projects/`) and About (`/about/`) now share a validated,
+bilingual block document. Signed-in admins outside visitor view can open
+**Modifier la page** at bottom-left, or follow the dashboard's visual-editor
+links. The public SSR canvas uses only committed `src/content/pages/{id}.json`
+files (or the original default document), never a private draft.
+
+Supported blocks: hero, text, image, native video, button, columns and cards.
+Text is edited directly and safely treated as text, not executable HTML.
+Media references use site-relative paths or HTTPS URLs. Common settings cover
+colors, background images, padding, alignment and width. Unknown block types,
+unsafe URLs, arbitrary CSS/HTML and excessive documents are rejected server-side.
+
+**Enregistrer le brouillon** stores the full bilingual page privately in D1.
+**Publier** first saves that draft, then writes the exact document to GitHub,
+which starts the Vercel build. Publication can therefore take about a minute.
+Draft revision and published SHA checks prevent another tab from silently
+replacing newer work. Drafts preserve their original publication base SHA;
+a stale draft must be deliberately reconciled rather than force-published.
+If publication succeeds but draft synchronization fails, the editor reports
+partial success instead of falsely claiming no publication occurred.
+
+The `page_drafts` table is added by the existing Worker schema migration.
+Private endpoints `/api/pages/home`, `/api/pages/projects`, `/api/pages/about`
+require a current admin session. Draft writes, discards and publications also
+require the matching Origin and bounded validated JSON bodies. No new service
+credentials are needed. Existing gallery and Video QR editors remain separate.

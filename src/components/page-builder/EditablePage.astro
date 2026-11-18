@@ -1,0 +1,34 @@
+---
+import PageBlocks from './PageBlocks';
+import { publishedPage } from '../../lib/page-builder-content';
+import type { PageId } from '../../lib/page-builder-schema';
+interface Props { pageId:PageId }
+const { pageId }=Astro.props;
+const document=publishedPage(pageId);
+---
+<div data-page-published><PageBlocks document={document}/></div>
+<div data-page-builder={pageId}></div>
+<script>
+ import { visitorView } from '../../lib/visitor-view';
+ import type { PageId } from '../../lib/page-builder-schema';
+ const mount=document.querySelector<HTMLElement>('[data-page-builder]');
+ const pageId=mount?.dataset.pageBuilder;
+  if(mount&&pageId&&['home','projects','about'].includes(pageId)&&!visitorView()){
+  fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json()).then(async session=>{
+   if(!session.authenticated)return;
+   try {
+   if(import.meta.env.DEV) await import('@vitejs/plugin-react/preamble');
+   const [{createRoot},{createElement},{default:PageBuilder}]=await Promise.all([import('react-dom/client'),import('react'),import('./PageBuilder')]);
+   createRoot(mount).render(createElement(PageBuilder,{pageId:pageId as PageId}));
+   } catch {
+    const retry=document.createElement('button');
+    retry.className='page-builder-retry';retry.textContent='Éditeur indisponible · Réessayer';
+    retry.addEventListener('click',()=>location.reload());mount.replaceChildren(retry);
+   }
+  }).catch(()=>{ /* A failed admin check never affects public page rendering. */ });
+ }
+</script>
+
+<style is:global>
+ .page-builder-retry { position:fixed;left:1rem;bottom:1rem;z-index:1000;padding:.75rem 1rem;background:var(--paper);color:var(--ink);border:1px solid var(--line);cursor:pointer; }
+</style>

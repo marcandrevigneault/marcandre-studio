@@ -7,11 +7,41 @@ export default {
   async fetch(request, env) {
     if (!env.ADMIN_KEY || request.headers.get('authorization') !== `Bearer ${env.ADMIN_KEY}`) return json({ error: 'Unauthorized' }, 401);
     const url = new URL(request.url), db = env.DB;
+    const draftPage = /^\/page-drafts\/(home|projects|about)$/.exec(url.pathname)?.[1];
     try {
       let body;
-      if (['POST', 'PUT'].includes(request.method)) {
-        const text = await request.text(); if (text.length > 4096) return json({error:'Too large'},413);
+      if (['POST', 'PUT'].includes(request.method) || (draftPage && request.method === 'DELETE')) {
+        const text = await request.text(); if (draftPage ? new TextEncoder().encode(text).length > 300000 : text.length > 4096) return json({error:'Too large'},413);
         try { body = JSON.parse(text); } catch { return json({error:'Invalid JSON'},400); }
+      }
+      if (draftPage) {
+        if (request.method === 'GET') {
+          const row = await db.prepare('SELECT content, revision FROM page_drafts WHERE page=?').bind(draftPage).first();
+          return json({draft: row ? {...JSON.parse(row.content), revision: row.revision} : null});
+        }
+        if (request.method === 'PUT') {
+          const document = body?.document;
+          const validSha = body?.baseSha === null || (typeof body?.baseSha === 'string' && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(body.baseSha));
+          const validRevision = value => typeof value === 'string' && uuid.test(value);
+          const validDocument = document?.version === 1 && Array.isArray(document.blocks)
+            && document.blocks.length >= 1 && document.blocks.length <= 60
+            && document.blocks.every(block => block && typeof block.id === 'string'
+              && /^[a-zA-Z0-9_-]{1,80}$/.test(block.id)
+              && ['hero','text','image','video','button','columns','cards'].includes(block.type));
+          if (!validSha || !validDocument || !validRevision(body?.revision)
+            || !(body.expectedRevision === null || validRevision(body.expectedRevision))
+            || body.revision === body.expectedRevision) return json({error:'Invalid draft'},400);
+          const content = JSON.stringify({document,baseSha:body.baseSha});
+          const result = body.expectedRevision === null
+            ? await db.prepare('INSERT OR IGNORE INTO page_drafts (page,content,revision) VALUES (?,?,?)').bind(draftPage,content,body.revision).run()
+            : await db.prepare('UPDATE page_drafts SET content=?,revision=? WHERE page=? AND revision=?').bind(content,body.revision,draftPage,body.expectedRevision).run();
+          return result.meta.changes === 1 ? json({ok:true}) : json({error:'Draft changed'},409);
+        }
+        if (request.method === 'DELETE') {
+          if (typeof body?.expectedRevision !== 'string' || !uuid.test(body.expectedRevision)) return json({error:'Invalid revision'},400);
+          const result = await db.prepare('DELETE FROM page_drafts WHERE page=? AND revision=?').bind(draftPage,body.expectedRevision).run();
+          return result.meta.changes === 1 ? json({ok:true}) : json({error:'Draft changed'},409);
+        }
       }
       if (url.pathname === '/credentials') {
         if (request.method === 'GET') {
