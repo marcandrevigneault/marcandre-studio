@@ -2,10 +2,10 @@
 import Text from './Text.astro';
 const path = Astro.url.pathname;
 const links = [
-  { href: '/photography/', label: 'Photographie', en: 'Photography' },
-  { href: '/art/', label: 'Art', en: 'Art' },
+  { href: '/photography/', label: 'Photographie', en: 'Photography', ready: false },
+  { href: '/art/', label: 'Art', en: 'Art', ready: false },
   { href: '/projects/', label: 'Projets', en: 'Projects' },
-  { href: '/science/', label: 'Science', en: 'Science' },
+  { href: '/science/', label: 'Science', en: 'Science', ready: false },
   { href: '/about/', label: 'À propos', en: 'About' },
 ];
 const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
@@ -17,7 +17,14 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     <ul>
       {links.map((l) => (
         <li>
-          <a href={l.href} class:list={[{ active: isActive(l.href) }]}><Text fr={l.label} en={l.en} /></a>
+          {l.ready === false ? (
+            <span class="coming-soon" aria-disabled="true">
+              <Text fr={l.label} en={l.en} />
+              <span class="status"><Text fr="À venir" en="Coming soon" /></span>
+            </span>
+          ) : (
+            <a href={l.href} class:list={[{ active: isActive(l.href) }]}><Text fr={l.label} en={l.en} /></a>
+          )}
         </li>
       ))}
     </ul>
@@ -63,13 +70,15 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     padding: 0;
     list-style: none;
   }
-  ul a {
+  ul a, .coming-soon {
     font-family: var(--font-sans);
     font-size: 0.8rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
   }
+  .coming-soon { display: inline-block; color: var(--muted); opacity: .55; cursor: default; }
+  .status { display: block; margin-top: .2rem; font-size: .6rem; letter-spacing: .06em; }
   ul a:hover { color: var(--ink); }
   ul a.active { color: var(--ink); }
   ul a.active::after {

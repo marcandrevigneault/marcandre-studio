@@ -1,6 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Text from '../components/Text.astro';
+import InlineArticleEditor from '../components/InlineArticleEditor.astro';
+import { articleCopy } from '../lib/article-content';
 import { frenchText } from '../lib/content-translations';
 import type { CollectionEntry } from 'astro:content';
 
@@ -9,19 +11,21 @@ interface Props {
 }
 const { article } = Astro.props;
 const { data } = article;
+const fr = articleCopy(article.id, 'fr');
+const en = articleCopy(article.id, 'en');
 const dateTextFr = data.date.toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
 const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title={frenchText(data.title)} description={frenchText(data.summary)} titleEn={data.title} descriptionEn={data.summary}>
+<BaseLayout title={fr.title} description={fr.summary} titleEn={en.title} descriptionEn={en.summary}>
   <article class="article">
     <header class="head measure">
       <p class="eyebrow">
         <Text fr={data.topics.map(frenchText).join(' · ') || 'Notes'} en={data.topics.join(' · ') || 'Notes'} />
         {data.readingTime && <span> · <Text fr={frenchText(data.readingTime)} en={data.readingTime} /></span>}
       </p>
-      <h1><Text fr={frenchText(data.title)} en={data.title} /></h1>
-      {data.subtitle && <p class="subtitle"><Text fr={frenchText(data.subtitle)} en={data.subtitle} /></p>}
+      <h1 data-article-title><Text fr={fr.title} en={en.title} /></h1>
+      <p class="subtitle" data-article-subtitle><Text fr={fr.subtitle} en={en.subtitle} /></p>
       <p class="byline"><Text fr={dateTextFr} en={dateText} /></p>
     </header>
 
@@ -31,7 +35,8 @@ const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month:
       </figure>
     )}
 
-    <div class="prose measure">
+    <InlineArticleEditor slug={article.id} />
+    <div class="prose measure" data-article-body>
       <slot />
     </div>
 

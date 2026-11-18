@@ -14,3 +14,5 @@ npm-debug.log*
 .DS_Store
 # Standalone app copied into the site at build time
 public/tools/video-qr/
+.env.*
+!.env.example

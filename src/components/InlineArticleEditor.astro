@@ -1,0 +1,56 @@
+---
+import Text from './Text.astro';
+interface Props { slug: string }
+const { slug } = Astro.props;
+---
+<div class="inline-editor measure" data-article-editor={slug}>
+  <div class="edit-bar">
+    <a class="editor-login" href={`/admin/login?returnTo=${encodeURIComponent(`/science/${slug}/?edit=1`)}`}><Text fr="Modifier cette page" en="Edit this page" /></a>
+    <button type="button" class="editor-open" hidden><Text fr="Modifier · Markdown" en="Edit · Markdown" /></button>
+    <span class="editor-hint" hidden><Text fr="Ou double-cliquez sur le texte." en="Or double-click the text." /></span>
+  </div>
+  <p class="editor-status" role="status" aria-live="polite"></p>
+  <form class="editor-form" hidden>
+    <div class="editor-heading"><strong><Text fr="Modifier l’article" en="Edit article" /></strong><span class="editor-language"></span></div>
+    <label><Text fr="Titre" en="Title" /><input name="title" required maxlength="240" /></label>
+    <label><Text fr="Sous-titre" en="Subtitle" /><input name="subtitle" maxlength="1000" /></label>
+    <label><Text fr="Résumé" en="Summary" /><textarea name="summary" rows="2" maxlength="2000"></textarea></label>
+    <label><Text fr="Texte · Markdown" en="Body · Markdown" /><textarea name="body" class="markdown-source" rows="18" maxlength="150000" spellcheck="true"></textarea></label>
+    <p class="markdown-help"><Text fr="# Titre · **gras** · *italique* · [lien](https://…) · formules $…$" en="# Heading · **bold** · *italic* · [link](https://…) · formulas $…$" /></p>
+    <div class="editor-actions">
+      <button type="button" class="editor-preview"><Text fr="Aperçu" en="Preview" /></button>
+      <button type="submit" class="editor-publish"><Text fr="Enregistrer et publier" en="Save and publish" /></button>
+      <button type="button" class="editor-cancel"><Text fr="Annuler" en="Cancel" /></button>
+    </div>
+    <div class="preview-panel" hidden><p class="eyebrow"><Text fr="Aperçu · non publié" en="Preview · unpublished" /></p><h2 class="preview-title"></h2><p class="preview-subtitle"></p><div class="preview-body prose"></div></div>
+  </form>
+</div>
+<script src="../scripts/article-editor.ts"></script>
+<style>
+  .inline-editor { margin-bottom: 1.5rem; font-family: var(--font-sans); }
+  .inline-editor [hidden] { display: none !important; }
+  .edit-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: .75rem; }
+  .editor-login { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .editor-hint { color: var(--muted); }
+  button { font: inherit; cursor: pointer; padding: .55rem .85rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); }
+  button:disabled { opacity: .55; cursor: wait; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .editor-form { padding: clamp(1rem, 3vw, 1.7rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+  .editor-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+  .editor-language { color: var(--muted); }
+  label { display: grid; gap: .4rem; font-size: .85rem; margin-bottom: 1rem; }
+  input, textarea { width: 100%; min-width: 0; padding: .7rem; border: 1px solid var(--line); border-radius: var(--radius); font: inherit; font-size: 1rem; color: var(--ink); background: var(--paper); }
+  textarea { resize: vertical; }
+  .markdown-source { font: .9rem/1.65 var(--font-mono); min-height: 300px; tab-size: 2; }
+  .markdown-help { font-size: .75rem; color: var(--muted); margin: -.4rem 0 1rem; }
+  .editor-actions { display: flex; flex-wrap: wrap; gap: .6rem; font-size: .85rem; }
+  .editor-publish { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .editor-status { font-size: .85rem; white-space: pre-line; }
+  .editor-status:empty { display: none; }
+  .editor-status[data-error=true] { color: var(--accent); }
+  .preview-panel { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+  .preview-body { font-family: var(--font-body, Georgia, serif); }
+  .preview-body :global(img) { max-width: 100%; }
+  .preview-body :global(pre), .preview-body :global(.katex-display) { overflow-x: auto; }
+  @media(max-width: 600px) { .markdown-source { font-size: 1rem; } }
+</style>

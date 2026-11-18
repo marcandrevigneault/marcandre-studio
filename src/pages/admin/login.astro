@@ -2,7 +2,9 @@
 export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { isValidSession } from '../../lib/auth';
-if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect('/admin');
+import { safeReturnPath } from '../../lib/return-path';
+const returnTo = safeReturnPath(Astro.url.searchParams.get('returnTo'));
+if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(returnTo);
 ---
 <BaseLayout title="Admin login" bareNav={true}>
   <div class="login-wrap">
@@ -167,6 +169,7 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect('
 </style>
 
 <script>
+  import { safeReturnPath } from '../../lib/return-path';
   const form = document.getElementById('login-form') as HTMLFormElement;
   const passwordInput = document.getElementById('pw') as HTMLInputElement;
   const signinBtn = document.getElementById('signin') as HTMLButtonElement;
@@ -198,7 +201,7 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect('
       });
 
       if (res.ok) {
-        location.href = '/admin';
+        location.href = safeReturnPath(new URL(location.href).searchParams.get('returnTo'));
         return;
       }
 

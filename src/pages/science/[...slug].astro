@@ -1,5 +1,7 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { articleCopy } from '../../lib/article-content';
+import { renderArticleMarkdown } from '../../lib/article-editing';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 
 export async function getStaticPaths() {
@@ -10,15 +12,11 @@ export async function getStaticPaths() {
   }));
 }
 
-const translations = import.meta.glob('../../content-translations/fr/*.mdx', { eager: true });
 const { article } = Astro.props;
-const FrenchContent = (translations[`../../content-translations/fr/${article.id}.mdx`] as { default: any } | undefined)?.default;
-const { Content } = await render(article);
+const [fr, en] = await Promise.all(['fr', 'en'].map(language => renderArticleMarkdown(articleCopy(article.id, language as 'fr' | 'en').body)));
 ---
 
 <ArticleLayout article={article}>
-  {FrenchContent ? (<>
-    <div data-language-content="fr" lang="fr"><FrenchContent /></div>
-    <div data-language-content="en" lang="en"><Content /></div>
-  </>) : <Content />}
+  <div data-language-content="fr" lang="fr" set:html={fr} />
+  <div data-language-content="en" lang="en" set:html={en} />
 </ArticleLayout>

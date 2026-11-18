@@ -10,8 +10,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const isLoginPage = pathname === '/admin/login';
   const isLoginApi = pathname === '/api/auth/login';
+  const isSessionApi = pathname === '/api/auth/session' && context.request.method === 'GET';
 
-  if (pathname.startsWith('/api/') && !isLoginApi && !authed) {
+  if (pathname.startsWith('/api/') && !isLoginApi && !isSessionApi && !authed) {
     return new Response(JSON.stringify({ error: 'unauthorized' }), {
       status: 401, headers: { 'content-type': 'application/json' },
     });

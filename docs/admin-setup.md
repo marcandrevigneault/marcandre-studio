@@ -231,3 +231,27 @@ write access, Vercel connected to the repo).
 - Confirm the UI shows a success message.
 - Open the GitHub repo and confirm a commit removing the markdown file appears.
 - After the rebuild, confirm the gallery is gone from the public site.
+
+## Edit an article on its page
+
+Open the article's direct URL (for example `/science/why-golden-hour/`) and choose
+**Modifier cette page / Edit this page**. Sign in with your existing admin password;
+you will return to that article. Once signed in, double-click its text or use
+**Modifier · Markdown / Edit · Markdown** (also works on touch screens).
+
+The inline form edits the title, subtitle, summary and Markdown body in the currently
+selected language. **Aperçu / Preview** renders a sanitized preview, including math,
+without saving. **Enregistrer et publier / Save and publish** commits a language-specific
+file under `src/content/edits/` and triggers the existing GitHub → Vercel publication flow.
+The immediate on-page result is the owner's local view; other visitors receive the
+new version when deployment completes. The original article and other language remain
+unchanged. HTML/MDX components are not supported in this editor; use standard Markdown.
+
+A failed save or expired session leaves the draft in the form. If another tab has saved
+first, copy the draft before reloading: revision checks prevent overwriting that newer
+version. Leaving with unsaved work prompts before navigation. Drafts are not stored
+across reloads. Sign in again in another tab if the session expires while editing.
+
+Photography, Art and Science are currently marked coming soon, as are the existing
+Video, Poetry and Travel entries. Their sample content is no longer promoted on the
+homepage. Existing article URLs remain available for editing.

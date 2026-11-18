@@ -5,16 +5,25 @@ let stored: string | null = null;
 try { stored = localStorage.getItem('studio-language'); } catch { /* Storage can be disabled. */ }
 // Keep existing shared article links pointing at the visible translated section.
 const headingPairs: { fr: HTMLElement; en: HTMLElement; anchor: string; frenchAnchor: string }[] = [];
-const frenchBody = document.querySelector('[data-language-content="fr"]');
-const englishBody = document.querySelector('[data-language-content="en"]');
-if (frenchBody && englishBody) {
-  const fr = [...frenchBody.querySelectorAll<HTMLElement>('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]')];
-  const en = [...englishBody.querySelectorAll<HTMLElement>('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]')];
+function refreshHeadingPairs() {
+  headingPairs.length = 0;
+  const frenchBody = document.querySelector('[data-language-content="fr"]');
+  const englishBody = document.querySelector('[data-language-content="en"]');
+  if (!frenchBody || !englishBody) return;
+  const headings = (body: Element) => [...body.querySelectorAll<HTMLElement>('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]')].map(heading => {
+    heading.dataset.languageOriginalId ??= heading.id;
+    heading.id = heading.dataset.languageOriginalId;
+    return heading;
+  });
+  const fr = headings(frenchBody), en = headings(englishBody);
   if (fr.length === en.length && fr.every((heading, index) => heading.tagName === en[index].tagName)) {
     fr.forEach((heading, index) => headingPairs.push({fr: heading, en: en[index], anchor: en[index].id, frenchAnchor: heading.id}));
   }
 }
+refreshHeadingPairs();
 function apply(language: Language) {
+  const locked = document.documentElement.dataset.articleEditingLanguage;
+  if (locked && locked !== language) return;
   document.documentElement.lang = language;
   document.querySelectorAll<HTMLElement>('[data-i18n-fr]').forEach(element => {
     element.textContent = element.getAttribute(`data-i18n-${language}`) ?? element.getAttribute('data-i18n-fr');
@@ -60,3 +69,5 @@ function scrollToFragment() {
   }
 }
 window.addEventListener('hashchange', scrollToFragment);
+
+document.addEventListener('studio:article-updated', () => { refreshHeadingPairs(); apply(document.documentElement.lang === 'en' ? 'en' : 'fr'); });

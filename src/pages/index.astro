@@ -1,30 +1,15 @@
 ---
 import Text from '../components/Text.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { frenchText } from '../lib/content-translations';
-import { getCollection } from 'astro:content';
-
-const published = (c: { data: { draft: boolean } }) => import.meta.env.DEV || !c.data.draft;
-
-const galleries = (await getCollection('galleries', published)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const articles = (await getCollection('articles', published)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-
-const featuredGallery = galleries.find((g) => g.data.featured) ?? galleries[0];
-const latestArticle = articles[0];
-
 // Sections of the studio — the ones that aren't live yet are marked "soon".
 const sections = [
-  { href: '/photography/', label: 'Photographie', labelEn: 'Photography', note: 'Des galeries, autant d’univers', noteEn: 'Galleries, each its own world', ready: true },
-  { href: '/art/', label: 'Art', labelEn: 'Art', note: 'Créations numériques et explorations', noteEn: 'Digital works & other explorations', ready: true },
+  { href: '/photography/', label: 'Photographie', labelEn: 'Photography', note: 'À venir', noteEn: 'Coming soon', ready: false },
+  { href: '/art/', label: 'Art', labelEn: 'Art', note: 'À venir', noteEn: 'Coming soon', ready: false },
   { href: '/projects/', label: 'Projets', labelEn: 'Projects', note: 'Des expériences à essayer', noteEn: 'Experiments you can try', ready: true },
-  { href: '/science/', label: 'Science', labelEn: 'Science', note: 'Hydroponie, optique et autres curiosités', noteEn: 'Notes on hydroponics, optics & more', ready: true },
-  { href: '#', label: 'Vidéo', labelEn: 'Video', note: 'À venir', noteEn: 'Coming soon', ready: false },
-  { href: '#', label: 'Poésie', labelEn: 'Poetry', note: 'À venir', noteEn: 'Coming soon', ready: false },
-  { href: '#', label: 'Voyage', labelEn: 'Travel', note: 'À venir', noteEn: 'Coming soon', ready: false },
+  { href: '/science/', label: 'Science', labelEn: 'Science', note: 'À venir', noteEn: 'Coming soon', ready: false },
+  { label: 'Vidéo', labelEn: 'Video', note: 'À venir', noteEn: 'Coming soon', ready: false },
+  { label: 'Poésie', labelEn: 'Poetry', note: 'À venir', noteEn: 'Coming soon', ready: false },
+  { label: 'Voyage', labelEn: 'Travel', note: 'À venir', noteEn: 'Coming soon', ready: false },
 ];
 ---
 
@@ -39,43 +24,19 @@ const sections = [
   </section>
 
   <nav class="sections wrap" aria-label="Sections" data-i18n-fr-aria-label="Sections" data-i18n-en-aria-label="Sections">
-    {sections.map((s, i) => (
-      <a
-        href={s.href}
-        class:list={['section-card', { soon: !s.ready }]}
-        data-reveal={String(i)}
-        aria-disabled={!s.ready}
-      >
+    {sections.map((s, i) => s.ready ? (
+      <a href={s.href} class="section-card" data-reveal={String(i)}>
         <span class="label"><Text fr={s.label} en={s.labelEn} /></span>
         <span class="note"><Text fr={s.note} en={s.noteEn} /></span>
       </a>
+    ) : (
+      <div class="section-card soon" aria-disabled="true" data-reveal={String(i)}>
+        <span class="label"><Text fr={s.label} en={s.labelEn} /></span>
+        <span class="note"><Text fr={s.note} en={s.noteEn} /></span>
+      </div>
     ))}
   </nav>
 
-  {featuredGallery && (
-    <section class="feature wrap" data-reveal>
-      <a href={`/photography/${featuredGallery.id}/`} class="feature-link" style={`--cover:url('${featuredGallery.data.cover}')`}>
-        <div class="feature-bg"></div>
-        <div class="feature-text">
-          <p class="eyebrow"><Text fr="Galerie en vedette" en="Featured gallery" /></p>
-          <h2><Text fr={frenchText(featuredGallery.data.title)} en={featuredGallery.data.title} /></h2>
-          <p><Text fr={frenchText(featuredGallery.data.summary)} en={featuredGallery.data.summary} /></p>
-          <span class="cta"><Text fr="Entrer dans la galerie →" en="Enter the gallery →" /></span>
-        </div>
-      </a>
-    </section>
-  )}
-
-  {latestArticle && (
-    <section class="latest measure" data-reveal>
-      <p class="eyebrow"><Text fr="Dernier article" en="Latest writing" /></p>
-      <a href={`/science/${latestArticle.id}/`} class="latest-link">
-        <h3><Text fr={frenchText(latestArticle.data.title)} en={latestArticle.data.title} /></h3>
-        <p><Text fr={frenchText(latestArticle.data.summary)} en={latestArticle.data.summary} /></p>
-        <span class="cta"><Text fr="Lire →" en="Read →" /></span>
-      </a>
-    </section>
-  )}
 </BaseLayout>
 
 <style>
@@ -107,58 +68,9 @@ const sections = [
     justify-content: flex-end;
     transition: background-color 0.4s var(--ease);
   }
-  .section-card:hover { background: color-mix(in oklab, var(--accent) 8%, var(--paper)); }
+  a.section-card:hover { background: color-mix(in oklab, var(--accent) 8%, var(--paper)); }
   .section-card .label { font-family: var(--font-display); font-size: 1.35rem; }
   .section-card .note { font-size: 0.82rem; color: var(--muted); }
-  .section-card.soon { pointer-events: none; opacity: 0.5; }
+  .section-card.soon { color: var(--muted); opacity: 0.5; cursor: default; }
 
-  .feature { margin-bottom: clamp(3rem, 9vw, 6rem); }
-  .feature-link {
-    position: relative;
-    display: block;
-    min-height: clamp(340px, 55vh, 560px);
-    border-radius: var(--radius);
-    overflow: hidden;
-    isolation: isolate;
-    color: #fff;
-  }
-  .feature-bg {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background-image: var(--cover);
-    background-size: cover;
-    background-position: center;
-    transition: transform 1.2s var(--ease);
-  }
-  .feature-link::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%, transparent);
-  }
-  .feature-link:hover .feature-bg { transform: scale(1.04); }
-  .feature-text {
-    position: absolute;
-    bottom: 0;
-    padding: clamp(1.5rem, 4vw, 3rem);
-    max-width: 60ch;
-  }
-  .feature-text .eyebrow { color: rgba(255,255,255,0.75); }
-  .feature-text h2 { color: #fff; }
-  .feature-text p { color: rgba(255,255,255,0.85); }
-  .cta {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-  }
-  .feature-text .cta { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.6); padding-bottom: 2px; }
-
-  .latest { margin-bottom: clamp(2rem, 6vw, 4rem); }
-  .latest-link { display: block; }
-  .latest-link h3 { margin-top: 0.4rem; transition: color 0.3s var(--ease); }
-  .latest-link:hover h3 { color: var(--accent); }
-  .latest-link p { color: var(--muted); }
 </style>
