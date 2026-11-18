@@ -1,5 +1,9 @@
 # Example provenance
 
+`la-bete-lumineuse-3662-7.jpg`: header still extracted at 3662.7 seconds
+(01:01:02.7) from the existing 96×59 full-film WebM, enlarged using nearest
+neighbor interpolation to retain its pixel texture. It contains no audio.
+
 La Bête lumineuse (Pierre Perrault, 1982). Source used in the earlier experiment:
 https://www.youtube.com/watch?v=7Co_VgBgI7g
 

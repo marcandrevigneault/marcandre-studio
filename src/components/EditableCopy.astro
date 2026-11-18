@@ -1,0 +1,34 @@
+---
+import Text from './Text.astro';
+import InlineArticleEditor from './InlineArticleEditor.astro';
+import { articleCopy } from '../lib/article-content';
+import { renderArticleMarkdown } from '../lib/article-editing';
+interface Props { slug: string; heading?: 'h1' | 'h2' | 'h3'; lead?: boolean; showLogin?: boolean }
+const { slug, heading: Heading = 'h3', lead = false, showLogin = false } = Astro.props;
+const fr = articleCopy(slug, 'fr'), en = articleCopy(slug, 'en');
+const [frBody, enBody] = await Promise.all([renderArticleMarkdown(fr.body), renderArticleMarkdown(en.body)]);
+---
+<div data-editable-region id={`edit-${slug}`} class:list={['editable-copy', { lead }]}>
+  <InlineArticleEditor slug={slug} pagePath={Astro.url.pathname} showLogin={showLogin} />
+  <p class="eyebrow" data-article-subtitle><Text fr={fr.subtitle} en={en.subtitle} /></p>
+  <Heading data-article-title><Text fr={fr.title} en={en.title} /></Heading>
+  <p class="editable-summary" data-article-summary><Text fr={fr.summary} en={en.summary} /></p>
+  <div data-article-body class="editable-body">
+    <div data-language-content="fr" lang="fr" set:html={frBody} />
+    <div data-language-content="en" lang="en" set:html={enBody} />
+  </div>
+</div>
+<style>
+  .editable-copy { min-width: 0; }
+  h1, h2, h3 { white-space: pre-line; }
+  .editable-summary:has(span:empty) { display: none; }
+  .editable-body { color: var(--muted); font-size: .8rem; max-width: 55ch; overflow-wrap: anywhere; }
+  .lead .editable-body { font-size: 1.2rem; max-width: 49ch; }
+  .editable-body :global(img) { max-width: 100%; }
+  .editable-body :global(pre) { overflow-x: auto; }
+  .editable-body :global(p:last-child) { margin-bottom: .6rem; }
+  h1 { max-width: 17ch; }
+  h3 { font-size: clamp(1.15rem, 2vw, 1.6rem); }
+  [data-editable-region] :global(.inline-editor) { margin: 0 0 .7rem; }
+  [data-editable-region] :global(.inline-editor:has(.editor-login[hidden]):has(.editor-open[hidden]):has(.editor-form[hidden]):has(.editor-status:empty)) { display: none; }
+</style>

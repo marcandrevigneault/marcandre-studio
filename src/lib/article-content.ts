@@ -1,4 +1,5 @@
 import matter from 'gray-matter';
+import { originalPageBlock } from './page-content';
 import { frenchText } from './content-translations';
 import { articleEditPath, parseArticleEdit, type ArticleEdit, type ArticleLanguage } from './article-editing';
 
@@ -8,6 +9,8 @@ const edits = import.meta.glob('../content/edits/*.md', { eager: true, query: '?
 
 export function originalArticle(slug: string, language: ArticleLanguage): ArticleEdit | null {
   articleEditPath(slug, language);
+  const page = originalPageBlock(slug, language);
+  if (page) return page;
   const raw = originals[`../content/articles/${slug}.mdx`] ?? originals[`../content/articles/${slug}.md`];
   if (raw === undefined) return null;
   const { data, content } = matter(raw);

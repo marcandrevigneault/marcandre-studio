@@ -1,18 +1,18 @@
 ---
 import Text from './Text.astro';
-interface Props { slug: string }
-const { slug } = Astro.props;
+interface Props { slug: string; pagePath?: string; showLogin?: boolean }
+const { slug, pagePath = `/science/${Astro.props.slug}/`, showLogin = true } = Astro.props;
 ---
 <div class="inline-editor measure" data-article-editor={slug}>
   <div class="edit-bar">
-    <a class="editor-login" href={`/admin/login?returnTo=${encodeURIComponent(`/science/${slug}/?edit=1`)}`}><Text fr="Modifier cette page" en="Edit this page" /></a>
+    <a class="editor-login" hidden={!showLogin} href={`/admin/login?returnTo=${encodeURIComponent(`${pagePath}?edit=${slug}`)}`}><Text fr="Modifier cette page" en="Edit this page" /></a>
     <button type="button" class="editor-open" hidden><Text fr="Modifier · Markdown" en="Edit · Markdown" /></button>
     <span class="editor-hint" hidden><Text fr="Ou double-cliquez sur le texte." en="Or double-click the text." /></span>
   </div>
   <p class="editor-status" role="status" aria-live="polite"></p>
   <form class="editor-form" hidden>
-    <div class="editor-heading"><strong><Text fr="Modifier l’article" en="Edit article" /></strong><span class="editor-language"></span></div>
-    <label><Text fr="Titre" en="Title" /><input name="title" required maxlength="240" /></label>
+    <div class="editor-heading"><strong><Text fr="Modifier le texte" en="Edit text" /></strong><span class="editor-language"></span></div>
+    <label><Text fr="Titre" en="Title" /><textarea name="title" rows="2" required maxlength="240"></textarea></label>
     <label><Text fr="Sous-titre" en="Subtitle" /><input name="subtitle" maxlength="1000" /></label>
     <label><Text fr="Résumé" en="Summary" /><textarea name="summary" rows="2" maxlength="2000"></textarea></label>
     <label><Text fr="Texte · Markdown" en="Body · Markdown" /><textarea name="body" class="markdown-source" rows="18" maxlength="150000" spellcheck="true"></textarea></label>

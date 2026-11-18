@@ -1,9 +1,9 @@
 import type { ArticleEdit, ArticleLanguage } from '../lib/article-editing';
 
-const editor = document.querySelector<HTMLElement>('[data-article-editor]');
-if (editor) initialize(editor);
+const session = fetch('/api/auth/session', { cache: 'no-store' }).then(response => response.json());
+document.querySelectorAll<HTMLElement>('[data-article-editor]').forEach(initialize);
 function initialize(root: HTMLElement) {
-  const article = document.querySelector<HTMLElement>('article.article')!;
+  const article = root.closest<HTMLElement>('[data-editable-region]') ?? document.querySelector<HTMLElement>('article.article')!;
   const bodyContainer = article.querySelector<HTMLElement>('[data-article-body]')!;
   const form = root.querySelector<HTMLFormElement>('form')!;
   const opener = root.querySelector<HTMLButtonElement>('.editor-open')!;
@@ -31,7 +31,7 @@ function initialize(root: HTMLElement) {
     else delete document.documentElement.dataset.articleEditingLanguage;
     document.querySelectorAll<HTMLButtonElement>('[data-set-language]').forEach(b => b.disabled = value); }
   function loginLink() {
-    const target = new URL(location.href); target.searchParams.set('edit', '1'); target.searchParams.set('lang', language());
+    const target = new URL(location.href); target.searchParams.set('edit', root.dataset.articleEditor!); target.searchParams.set('lang', language());
     login.href = `/admin/login?returnTo=${encodeURIComponent(target.pathname + target.search)}`;
   }
   login.addEventListener('click', loginLink);
@@ -45,7 +45,10 @@ function initialize(root: HTMLElement) {
     return data;
   }
   async function open() {
-    if (!authenticated || busy || !form.hidden) return;
+    if (busy || !form.hidden) return;
+    if (!authenticated) { login.hidden = false; loginLink(); message(say('Connectez-vous avec « Modifier cette page » pour éditer ce texte.', 'Sign in using “Edit this page” to edit this text.')); login.focus(); return; }
+    if (document.querySelector('[data-editor-active]')) { message(say('Enregistrez ou annulez le texte déjà ouvert avant d’en modifier un autre.', 'Save or cancel the open text before editing another section.')); return; }
+    root.dataset.editorActive = 'true';
     editLanguage = language(); setBusy(true); message(say('Chargement de la dernière version…', 'Loading the latest version…'));
     try {
       const data = await responseData(await fetch(url(), { cache: 'no-store' }));
@@ -54,16 +57,17 @@ function initialize(root: HTMLElement) {
       root.querySelector('.editor-language')!.textContent = editLanguage === 'fr' ? 'Français' : 'English';
       fields.body.lang = editLanguage; form.hidden = false; bodyContainer.hidden = true; preview.hidden = true;
       opener.hidden = true; hint.hidden = true; lockLanguage(true); message(''); fields.body.focus();
-    } catch (error) { message(error instanceof Error ? error.message : 'Connection error', true); }
+    } catch (error) { delete root.dataset.editorActive; message(error instanceof Error ? error.message : 'Connection error', true); }
     finally { setBusy(false); }
   }
   function close() {
+    delete root.dataset.editorActive;
     form.hidden = true; bodyContainer.hidden = false; opener.hidden = false; hint.hidden = false; lockLanguage(false); opener.focus();
   }
   opener.addEventListener('click', open);
   article.addEventListener('dblclick', event => {
     const target = event.target as HTMLElement;
-    if (!target.closest('a,button,input,textarea,.inline-editor') && target.closest('.head,[data-article-body]')) void open();
+    if (!target.closest('a,button,input,textarea,.inline-editor') && target.closest('.head,[data-article-body],[data-article-title],[data-article-subtitle],[data-article-summary]')) void open();
   });
   root.querySelector('.editor-cancel')!.addEventListener('click', () => {
     if (busy || (dirty() && !confirm(say('Abandonner les modifications non enregistrées ?', 'Discard unsaved changes?')))) return;
@@ -85,7 +89,7 @@ function initialize(root: HTMLElement) {
         sha = result.sha; baseline = JSON.stringify(data);
         const body = bodyContainer.querySelector<HTMLElement>(`[data-language-content="${editLanguage}"]`);
         if (body) body.innerHTML = result.html;
-        for (const key of ['title', 'subtitle'] as const) {
+        for (const key of ['title', 'subtitle', 'summary'] as const) {
           const element = article.querySelector<HTMLElement>(`[data-article-${key}] [data-i18n-fr]`);
           if (element) { element.setAttribute(`data-i18n-${editLanguage}`, data[key]); if (language() === editLanguage) element.textContent = data[key]; }
         }
@@ -100,11 +104,12 @@ function initialize(root: HTMLElement) {
   form.addEventListener('input', () => { preview.hidden = true; });
   window.addEventListener('beforeunload', event => { if (dirty() || busy) { event.preventDefault(); event.returnValue = ''; } });
   loginLink();
-  fetch('/api/auth/session', { cache: 'no-store' }).then(response => response.json()).then(data => {
+  session.then(data => {
     authenticated = data.authenticated === true;
     if (authenticated) {
       login.hidden = true; opener.hidden = false; hint.hidden = false;
-      if (new URL(location.href).searchParams.get('edit') === '1') void open();
+      const requested = new URL(location.href).searchParams.get('edit');
+      if (requested === root.dataset.articleEditor || (requested === '1' && !root.closest('[data-editable-region]'))) void open();
     }
   }).catch(() => { /* The sign-in link remains usable if the session check fails. */ });
 }

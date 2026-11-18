@@ -255,3 +255,13 @@ across reloads. Sign in again in another tab if the session expires while editin
 Photography, Art and Science are currently marked coming soon, as are the existing
 Video, Poetry and Travel entries. Their sample content is no longer promoted on the
 homepage. Existing article URLs remain available for editing.
+
+
+### Video QR project page
+
+`/projects/video-qr/` also supports inline editing. The sign-in link appears above
+its title. Once authenticated, double-click the introduction, any of the three
+example descriptions, or the simulator introduction; each block also has an edit
+button. Each block saves independently using the same per-language revision checks.
+The video sources, QR images, and simulator remain outside the editable text.
+Only one editor opens at a time, and sign-in returns to the selected block.

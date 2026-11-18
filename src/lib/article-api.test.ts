@@ -45,3 +45,10 @@ describe('owner-only article API', () => {
     expect(store.write).not.toHaveBeenCalled();
   });
 });
+it('allows the Video QR introduction and sample descriptions to be edited like articles', async () => {
+  for (const slug of ['page-video-qr-intro', 'page-video-qr-sample-01', 'page-video-qr-sample-02', 'page-video-qr-sample-03', 'page-video-qr-generator']) {
+    const response = await GET(request('GET', undefined, {}, slug));
+    expect(response.status).toBe(200);
+    expect((await response.json()).title.length).toBeGreaterThan(0);
+  }
+});
