@@ -35,6 +35,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     </div>
   </nav>
 </header>
+<a href="/admin" class="visitor-return" hidden>Vue visiteur · Retour à l’administration ↗</a>
 
 <style>
   .languages { display: flex; gap: .2rem; }
@@ -92,10 +93,18 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
 </style>
 
 <script>
+  import { visitorView } from '../lib/visitor-view';
+  const preview = visitorView();
+  const back = document.querySelector<HTMLAnchorElement>('.visitor-return');
   const link = document.querySelector<HTMLAnchorElement>('.admin-link');
-  fetch('/api/auth/session', {cache:'no-store'}).then(r=>r.json()).then(data=>{if(link)link.hidden=data.authenticated!==true;}).catch(()=>{});
+  fetch('/api/auth/session', {cache:'no-store'}).then(r=>r.json()).then(data=>{if(link)link.hidden=data.authenticated!==true || preview;if(back)back.hidden=!(data.authenticated===true && preview);}).catch(()=>{});
 </script>
 <style>
   .admin-link[hidden] { display: none; }
   .admin-link { font-size: .75rem; border: 1px solid var(--line); padding: .4rem .6rem; }
+</style>
+
+<style>
+  .visitor-return[hidden] { display: none; }
+  .visitor-return { position: fixed; bottom: 1rem; right: 1rem; z-index: 80; max-width: calc(100vw - 2rem); padding: .7rem 1rem; border: 1px solid var(--line); background: var(--paper); color: var(--ink); box-shadow: 0 2px 12px #0002; font: .75rem var(--font-sans); }
 </style>

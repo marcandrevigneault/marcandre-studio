@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import type { Gallery } from './types';
 import { fetchGalleries, deleteGallery } from './api-client';
 import './dashboard.css';
+import { exitVisitorView } from '../../lib/visitor-view';
 
 interface Stats {
   days: number;
@@ -134,6 +135,7 @@ function PasswordSettings() {
 }
 
 export default function Dashboard() {
+  useEffect(() => { exitVisitorView(); }, []);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState(true);
   const [galleryError, setGalleryError] = useState('');
@@ -205,7 +207,7 @@ export default function Dashboard() {
   const metric = (value: number | undefined) => statsPending ? '…' : value === undefined ? '—' : number.format(value);
   return <div className="dashboard" lang="fr">
     <header className="dashboard-topbar"><a className="dashboard-wordmark" href="/admin">Studio<span>.</span></a><span className="dashboard-top-label">Administration</span>
-      <div className="dashboard-top-actions"><a href="/" className="dashboard-text-link">Voir le site <span aria-hidden="true">↗</span></a><button className="btn ghost" type="button" disabled={loggingOut} onClick={onLogout}>{loggingOut ? 'Déconnexion…' : 'Se déconnecter'}</button></div>
+      <div className="dashboard-top-actions"><a href="/?visitor=1" className="dashboard-text-link">Voir comme visiteur <span aria-hidden="true">↗</span></a><button className="btn ghost" type="button" disabled={loggingOut} onClick={onLogout}>{loggingOut ? 'Déconnexion…' : 'Se déconnecter'}</button></div>
     </header>
     <div className="dashboard-content">
       {logoutError && <p className="dashboard-error" role="alert">{logoutError}</p>}
@@ -227,7 +229,7 @@ export default function Dashboard() {
         </div>
       </section>
       <section className="dashboard-panel" id="contenus" aria-labelledby="content-title"><header className="dashboard-section-head"><div><p className="dashboard-kicker">02 / Publication</p><h2 id="content-title">Articles & liens utiles</h2></div></header>
-        <div className="dashboard-links"><a href="/projects/video-qr/?edit=page-video-qr-intro"><span className="dashboard-kicker">Article · Projet</span><strong>Vidéo QR <span aria-hidden="true">↗</span></strong><span>Modifier le texte d’introduction</span></a><a href="/science/"><span className="dashboard-kicker">Lecture</span><strong>Science <span aria-hidden="true">↗</span></strong><span>Section à venir</span></a><a href="/"><span className="dashboard-kicker">Site public</span><strong>Le site <span aria-hidden="true">↗</span></strong><span>Voir le site tel que vos visiteurs</span></a></div>
+        <div className="dashboard-links"><a href="/projects/video-qr/?edit=page-video-qr-intro"><span className="dashboard-kicker">Article · Projet</span><strong>Vidéo QR <span aria-hidden="true">↗</span></strong><span>Modifier le texte d’introduction</span></a><a href="/science/"><span className="dashboard-kicker">Lecture</span><strong>Science <span aria-hidden="true">↗</span></strong><span>Section à venir</span></a><a href="/?visitor=1"><span className="dashboard-kicker">Site public</span><strong>Le site <span aria-hidden="true">↗</span></strong><span>Voir le site tel que vos visiteurs</span></a></div>
       </section>
       <section className="dashboard-panel" id="galeries" aria-labelledby="gallery-title"><header className="dashboard-section-head"><div><p className="dashboard-kicker">Photographie</p><h2 id="gallery-title">Vos galeries</h2></div><div className="dashboard-gallery-actions"><button type="button" className="dashboard-text-button" disabled={loading || deleting !== null} onClick={() => setGalleryReload(n => n + 1)}>Actualiser</button><a className="dashboard-text-link" href="/admin/new">+ Créer</a></div></header>
         <div aria-busy={loading}><p className="dashboard-status" role="status">{loading ? 'Chargement des galeries…' : deleting ? 'Suppression en cours…' : galleryStatus}</p>

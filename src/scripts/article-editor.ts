@@ -1,3 +1,4 @@
+import { visitorView } from '../lib/visitor-view';
 import type { ArticleEdit, ArticleLanguage } from '../lib/article-editing';
 
 const session = fetch('/api/auth/session', { cache: 'no-store' }).then(response => response.json());
@@ -105,7 +106,7 @@ function initialize(root: HTMLElement) {
   window.addEventListener('beforeunload', event => { if (dirty() || busy) { event.preventDefault(); event.returnValue = ''; } });
   loginLink();
   session.then(data => {
-    authenticated = data.authenticated === true;
+    authenticated = data.authenticated === true && !visitorView();
     if (authenticated) {
       login.hidden = true; opener.hidden = false; hint.hidden = false;
       const requested = new URL(location.href).searchParams.get('edit');
