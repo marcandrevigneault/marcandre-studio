@@ -357,7 +357,19 @@ window.addEventListener('pageshow', event => { if (event.persisted) { renderValu
 renderLanguage(); controls();
 if (source.readyState >= 1) readMetadata();
 
-// Only content sizes drive the iframe; no viewport-height sizing or parent DOM access.
+// The embedded tool follows the site's language even when storage is unavailable.
+if (parent !== window) {
+  try {
+    const followSiteLanguage = () => {
+      const value = parent.document.documentElement.lang;
+      if (value === 'fr' || value === 'en') { language = value; renderLanguage(); }
+    };
+    followSiteLanguage();
+    new MutationObserver(followSiteLanguage).observe(parent.document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  } catch { /* Cross-origin embedding retains the normal language preference. */ }
+}
+
+// Only content sizes drive the iframe; no viewport-height sizing.
 if (parent !== window) {
   let lastHeight = 0;
   const notifyHeight = () => {
