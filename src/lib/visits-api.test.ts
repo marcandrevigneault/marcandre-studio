@@ -1,0 +1,10 @@
+import { beforeEach, expect, it, vi } from 'vitest';
+import { POST } from '../pages/api/visits';
+const service=vi.hoisted(()=>({adminService:vi.fn(),currentSession:vi.fn(),adminConfigured:()=>true}));
+vi.mock('./admin-service',()=>({...service,sameOrigin:(r:Request)=>r.headers.get('origin')===new URL(r.url).origin}));
+beforeEach(()=>{service.adminService.mockReset().mockResolvedValue({ok:true});service.currentSession.mockResolvedValue(false);});
+const event=()=>({id:crypto.randomUUID(),session:crypto.randomUUID(),path:'/projects/video-qr/'});
+const call=(data:any,extra:Record<string,string>={},host='marcandre-studio.vercel.app')=>{const url=new URL(`https://${host}/api/visits`);return POST({url,request:new Request(url,{method:'POST',headers:{origin:url.origin,'user-agent':'Mozilla/5.0','content-type':'application/json',...extra},body:JSON.stringify(data)})}as any);};
+it('records only validated public page events without excess fields',async()=>{const data=event();expect((await call({...data,ip:'unwanted',query:'secret'})).status).toBe(204);expect(service.adminService).toHaveBeenCalledWith('/events',data);});
+it('excludes admins, bots and preview traffic',async()=>{service.currentSession.mockResolvedValueOnce(true);await call(event());await call(event(),{'user-agent':'Googlebot'});await call(event(),{},'preview.vercel.app');expect(service.adminService).not.toHaveBeenCalled();});
+it('rejects foreign origins and private or query-containing paths',async()=>{expect((await call(event(),{origin:'https://evil.test'})).status).toBe(403);expect((await call({...event(),path:'/admin/'})).status).toBe(400);expect((await call({...event(),path:'/about/?secret=x'})).status).toBe(400);expect(service.adminService).not.toHaveBeenCalled();});

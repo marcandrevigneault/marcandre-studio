@@ -1,0 +1,11 @@
+{
+  "name": "marcandre-studio-admin",
+  "main": "index.js",
+  "compatibility_date": "2026-11-18",
+  "account_id": "b9307a7d02bfa840fbd6fa20502b3680",
+  "workers_dev": true,
+  "preview_urls": false,
+  "d1_databases": [{"binding": "DB", "database_name": "marcandre-studio-admin", "database_id": "f6008a04-508c-46aa-9798-a8f2e779d153"}],
+  "triggers": {"crons": ["17 5 * * *"]},
+  "observability": {"enabled": false}
+}

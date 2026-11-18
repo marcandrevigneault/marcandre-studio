@@ -24,9 +24,9 @@ export function verifyPassword(input: string): boolean {
   return safeEqual(input, requireEnvVar('ADMIN_PASSWORD'));
 }
 
-export function createSessionCookie(isSecure: boolean): string {
+export function createSessionCookie(isSecure: boolean, revision = ''): string {
   const exp = Math.floor(Date.now() / 1000) + MAX_AGE_SECONDS;
-  const payload = String(exp);
+  const payload = revision ? `${exp}:${revision}` : String(exp);
   const token = `${payload}.${sign(payload, requireEnvVar('SESSION_SECRET'))}`;
   return cookie(SESSION_COOKIE_NAME, token, MAX_AGE_SECONDS, isSecure);
 }
@@ -43,7 +43,7 @@ export function isValidSession(cookieHeader: string | null): boolean {
   const [payload, sig] = token.split('.');
   if (!payload || !sig) return false;
   if (!safeEqual(sig, sign(payload, requireEnvVar('SESSION_SECRET')))) return false;
-  const exp = Number(payload);
+  const exp = Number(payload.split(':')[0]);
   return Number.isFinite(exp) && exp > Math.floor(Date.now() / 1000);
 }
 
@@ -52,7 +52,7 @@ export function sessionExpiry(cookieHeader: string | null): number | null {
   if (!isValidSession(cookieHeader)) return null;
   const match = cookieHeader!.split(/;\s*/).find((c) => c.startsWith(`${SESSION_COOKIE_NAME}=`))!;
   const payload = match.slice(SESSION_COOKIE_NAME.length + 1).split('.')[0];
-  return Number(payload) - Math.floor(Date.now() / 1000);
+  return Number(payload.split(':')[0]) - Math.floor(Date.now() / 1000);
 }
 
 /** True when the request arrived over HTTPS (behind Vercel's proxy or direct). */
@@ -60,4 +60,10 @@ export function isSecureRequest(request: Request): boolean {
   const url = new URL(request.url);
   if (url.protocol === 'https:') return true;
   return request.headers.get('x-forwarded-proto')?.split(',')[0].trim() === 'https';
+}
+
+export function sessionRevision(cookieHeader: string | null): string {
+  if (!isValidSession(cookieHeader)) return '';
+  const token = cookieHeader!.split(/;\s*/).find(c => c.startsWith(`${SESSION_COOKIE_NAME}=`))!.slice(SESSION_COOKIE_NAME.length + 1);
+  return token.split('.')[0].split(':')[1] ?? '';
 }

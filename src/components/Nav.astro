@@ -28,6 +28,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
         </li>
       ))}
     </ul>
+    <a href="/admin" class="admin-link" hidden>Administration</a>
     <div class="languages" role="group" aria-label="Langue" data-i18n-fr-aria-label="Langue" data-i18n-en-aria-label="Language">
       <button type="button" data-set-language="fr" aria-pressed="true" aria-label="Français">FR</button>
       <button type="button" data-set-language="en" aria-pressed="false" aria-label="English">EN</button>
@@ -88,4 +89,13 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     margin-top: 4px;
     background: var(--accent);
   }
+</style>
+
+<script>
+  const link = document.querySelector<HTMLAnchorElement>('.admin-link');
+  fetch('/api/auth/session', {cache:'no-store'}).then(r=>r.json()).then(data=>{if(link)link.hidden=data.authenticated!==true;}).catch(()=>{});
+</script>
+<style>
+  .admin-link[hidden] { display: none; }
+  .admin-link { font-size: .75rem; border: 1px solid var(--line); padding: .4rem .6rem; }
 </style>

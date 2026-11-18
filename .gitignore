@@ -16,3 +16,7 @@ npm-debug.log*
 public/tools/video-qr/
 .env.*
 !.env.example
+
+# Cloudflare local state
+.wrangler/
+.dev.vars*

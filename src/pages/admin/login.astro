@@ -1,20 +1,22 @@
 ---
 export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { isValidSession } from '../../lib/auth';
+import { currentSession } from '../../lib/admin-service';
 import { safeReturnPath } from '../../lib/return-path';
 const returnTo = safeReturnPath(Astro.url.searchParams.get('returnTo'));
-if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(returnTo);
+let authenticated = false;
+try { authenticated = await currentSession(Astro.request.headers.get('cookie')); } catch { /* Keep login available when the data service is temporarily unreachable. */ }
+if (authenticated) return Astro.redirect(returnTo);
 ---
-<BaseLayout title="Admin login" bareNav={true}>
+<BaseLayout title="Connexion administrateur" bareNav={true}>
   <div class="login-wrap">
     <div class="login-card">
       <div class="wordmark">Studio<span class="dot">.</span></div>
-      <p class="login-sub">Marc-André's private workspace</p>
+      <p class="login-sub">L’espace privé de Marc-André</p>
       <div class="rule"></div>
       <form id="login-form" novalidate>
         <div class="field">
-          <label for="pw">Password</label>
+          <label for="pw">Mot de passe</label>
           <input
             class="input pw"
             id="pw"
@@ -25,9 +27,9 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(r
             required
           />
         </div>
-        <button class="btn block" type="submit" id="signin">Sign in</button>
+        <button class="btn block" type="submit" id="signin">Se connecter</button>
         <p class="login-error" id="err" role="alert" hidden></p>
-        <p class="login-foot" id="loginfoot">Stays signed in for 30 days on this device.</p>
+        <p class="login-foot" id="loginfoot">Connexion conservée pendant 30 jours sur cet appareil.</p>
       </form>
     </div>
   </div>
@@ -191,7 +193,7 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(r
 
     const password = passwordInput.value;
     signinBtn.disabled = true;
-    signinBtn.textContent = 'Signing in…';
+    signinBtn.textContent = 'Connexion…';
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -206,7 +208,7 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(r
       }
 
       if (res.status === 401) {
-        showError("That password didn't match.");
+        showError("Le mot de passe est incorrect.");
       } else {
         let serverMessage: string | undefined;
         try {
@@ -215,14 +217,14 @@ if (isValidSession(Astro.request.headers.get('cookie'))) return Astro.redirect(r
         } catch {
           // response body wasn't JSON (or parsing failed) — fall back below
         }
-        showError(serverMessage ?? `Something went wrong on the server (HTTP ${res.status}). Try again.`);
+        showError(serverMessage ?? `Erreur du serveur (HTTP ${res.status}). Réessayez.`);
       }
       signinBtn.disabled = false;
-      signinBtn.textContent = 'Sign in';
+      signinBtn.textContent = 'Se connecter';
     } catch {
-      showError("Couldn't reach the server — try again.");
+      showError("Le serveur est injoignable. Réessayez.");
       signinBtn.disabled = false;
-      signinBtn.textContent = 'Sign in';
+      signinBtn.textContent = 'Se connecter';
     }
   });
 </script>

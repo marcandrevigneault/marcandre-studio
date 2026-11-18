@@ -265,3 +265,45 @@ example descriptions, or the simulator introduction; each block also has an edit
 button. Each block saves independently using the same per-language revision checks.
 The video sources, QR images, and simulator remain outside the editable text.
 Only one editor opens at a time, and sign-in returns to the selected block.
+
+## Dashboard, traffic and password settings (November 2026)
+
+`/admin` is the French dashboard: 7/30-day traffic, page totals, galleries,
+content links and password settings. Signed-in users also get an Administration
+link in the public navigation. Visitors see no editing or admin controls.
+
+Production stores admin credentials and traffic in Cloudflare D1 through the
+private `workers/studio-admin` Worker. Vercel needs `STUDIO_ADMIN_URL` and
+`STUDIO_ADMIN_KEY`; the latter must match the Worker's `ADMIN_KEY` secret.
+The Worker accepts only the server bearer secret. Never put these in client code.
+Initialize schema with `wrangler d1 execute marcandre-studio-admin --remote
+--file workers/studio-admin/schema.sql --config workers/studio-admin/wrangler.jsonc`.
+Deploy with `wrangler deploy --config workers/studio-admin/wrangler.jsonc`.
+
+Credentials use randomly salted scrypt hashes. The current password is required
+for a change, which uses an optimistic revision check. Session cookies include
+that revision; all earlier sessions stop working after a change. The changing
+session receives a new cookie. Once the service is configured, the old
+`ADMIN_PASSWORD` environment variable cannot override a changed password and
+is not used as an outage fallback. Backend outages fail closed.
+
+For a forgotten password, an operator with Cloudflare access can securely replace
+its hash via the private credentials endpoint using its current revision, then
+supply the new password out of band. The dashboard intentionally does not offer
+an unauthenticated password reset without a verified recovery channel.
+Do not write passwords or the service key into GitHub or application logs.
+
+Traffic starts at activation and has no historical backfill. One page load is a
+page view. Visits are approximate per-tab sessions ending after 30 minutes of
+inactivity, held only in sessionStorage. Raw IP addresses, query strings, full
+referrers and persistent fingerprints are not stored. DNT/GPC, detected bots,
+admin pages, signed-in admins, development and preview hosts are excluded.
+Counts can be incomplete (blocked scripts) or include undetected bots. UTC days
+are shown explicitly. Rows are deduplicated by event UUID and retained for 90
+days; a daily cron also deletes expired password-attempt counters. Short-lived
+HMAC network identifiers are used only to limit password attempts (10/15 min).
+The dashboard displays unavailable errors separately from zero traffic.
+
+Run `npm test` for credential/revision/API/SQLite tests, and `npx astro build` for
+the site. For isolated browser checks, use local Wrangler/D1 with a test secret;
+never rotate the live owner's password or seed fake production visits for tests.

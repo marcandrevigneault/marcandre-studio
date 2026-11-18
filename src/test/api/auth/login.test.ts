@@ -8,12 +8,16 @@ beforeEach(() => {
 
 function req(body: any) {
   return new Request('http://localhost/api/auth/login', {
-    method: 'POST', headers: { 'content-type': 'application/json' },
+    method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost' },
     body: JSON.stringify(body),
   });
 }
 
 describe('POST /api/auth/login', () => {
+  it('rejects cross-origin login', async () => {
+    const request = req({password:'hunter2'}); request.headers.set('origin','https://other.test');
+    expect((await POST({request} as any)).status).toBe(403);
+  });
   it('sets a cookie on correct password', async () => {
     const res = await POST({ request: req({ password: 'hunter2' }) } as any);
     expect(res.status).toBe(200);
