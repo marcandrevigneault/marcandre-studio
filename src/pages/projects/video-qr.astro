@@ -53,8 +53,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   });
 </script>
 <style>
-  .intro-banner { --ink: #fff9ef; --muted: #e0d9ce; --paper: #181c18; --line: #ffffff40; color: var(--ink); background: linear-gradient(90deg, rgba(8, 13, 10, .88), rgba(8, 13, 10, .48)), url('/examples/video-qr/la-bete-lumineuse-3662-7.jpg') center 44% / cover no-repeat; }
+  .intro-banner { --ink: #fff9ef; --muted: #e0d9ce; --paper: #181c18; --line: #ffffff40; color: var(--ink); background: linear-gradient(90deg, rgba(8, 13, 10, .42), rgba(8, 13, 10, .08)), url('/examples/video-qr/la-bete-lumineuse-3662-7.jpg') center 44% / cover no-repeat; }
   .intro-banner :global(.editor-login) { display: inline-block; padding: .65rem 1rem; color: var(--ink); background: #181c18d9; border: 1px solid #ffffff80; text-decoration: none; }
+  .intro-banner :global([data-article-title]), .intro-banner :global(.editable-body), .intro-banner .platforms { text-shadow: 0 2px 6px #0009; }
   .intro-banner :global(.editor-form) { background: var(--paper); }
   .generator { padding-block: 1rem 4rem; }
   .generator h2 { max-width: 24ch; }
