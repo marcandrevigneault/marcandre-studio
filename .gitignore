@@ -12,3 +12,5 @@ npm-debug.log*
 .env.production
 # macOS
 .DS_Store
+# Standalone app copied into the site at build time
+public/tools/video-qr/

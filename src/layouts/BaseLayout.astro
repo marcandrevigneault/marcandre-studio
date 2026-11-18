@@ -13,7 +13,7 @@ interface Props {
   bareFooter?: boolean;
 }
 
-const { title, description = 'Photography, science, and other passions by Marc-André Vigneault.', bareNav = false, bareFooter = false } = Astro.props;
+const { title, description = 'Photography, art, projects, and science by Marc-André Vigneault.', bareNav = false, bareFooter = false } = Astro.props;
 const siteName = 'Marc-André Vigneault';
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 // Astro.site is undefined when this layout is rendered via experimental_AstroContainer

@@ -2,6 +2,8 @@
 const path = Astro.url.pathname;
 const links = [
   { href: '/photography/', label: 'Photography' },
+  { href: '/art/', label: 'Art' },
+  { href: '/projects/', label: 'Projects' },
   { href: '/science/', label: 'Science' },
   { href: '/about/', label: 'About' },
 ];
@@ -46,6 +48,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
   }
   ul {
     display: flex;
+    flex-wrap: wrap;
     gap: clamp(1rem, 3vw, 2.25rem);
     margin: 0;
     padding: 0;

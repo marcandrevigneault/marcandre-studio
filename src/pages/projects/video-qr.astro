@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Video QR" description="A tiny video, sound included, stored inside a QR code. Experiments with La Bête lumineuse.">
+  <header class="wrap intro">
+    <a class="back" href="/projects/">← Projects</a>
+    <p class="eyebrow">Video QR / An experiment in less</p>
+    <h1>A little cinema.<br />Inside a QR code.</h1>
+    <p class="lede">Shrink a video, keep its sound, and put the bytes inside a QR. Scan it to bring the clip back — no video link required.</p>
+    <a class="button" href="/tools/video-qr/index.html">Open the encoder / decoder ↗</a>
+    <p class="platforms">Web · Android & iPhone projects in development</p>
+  </header>
+  <section class="wrap examples" aria-labelledby="examples-title">
+    <div class="section-heading"><p class="eyebrow">The experiments</p><h2 id="examples-title">La Bête lumineuse</h2><p>Pierre Perrault, 1982 · <a href="https://www.youtube.com/watch?v=7Co_VgBgI7g">Source film ↗</a></p></div>
+    <div class="grid">
+      <article><div class="screen"><video controls playsinline preload="none" poster="/examples/video-qr/poster.png" aria-label="Eight-second preview of the compressed film"><source src="/examples/video-qr/film-preview.mp4" type="video/mp4" /></video></div><p class="eyebrow">01 / The whole film, made tiny</p><h3>2 hours. 18.44 MB.</h3><p>96 × 59 pixels · 8 FPS · 8 kbps mono audio.</p><p class="caption">An 8-second playback preview of our earlier full-film encode, padded by one row for MP4 playback. The full film requires many QR codes.</p></article>
+      <article><div class="screen"><img src="/examples/video-qr/gif-preview.gif" width="40" height="25" loading="lazy" alt="Four-second silent, sixteen-color excerpt from La Bête lumineuse" /></div><p class="eyebrow">02 / Even less</p><h3>16 colors. 14.66 MB.</h3><p>40 × 25 pixels · 8 FPS · silent GIF.</p><p class="caption">A 4-second excerpt. The measured size is for the complete 2-hour GIF.</p></article>
+    </div>
+    <article class="qr-demo"><div><p class="eyebrow">03 / Try a new QR</p><h3>Scan. Reassemble. Play.</h3><p>This new 2-second sample is stored in one QR. Open the decoder on another device, or save and import the image.</p><video controls playsinline preload="none" aria-label="Two-second sample encoded in the demonstration QR"><source src="/examples/video-qr/qr-preview.mp4" type="video/mp4" /></video><p class="caption">24 × 16 · 2 FPS · mono audio. Newly generated from the earlier compressed film; not the original chat’s QR format.</p></div><a href="/examples/video-qr/demo-qr.png" download="video-qr-demo.png" aria-label="Download the demonstration QR code"><img src="/examples/video-qr/demo-qr.png" width="555" height="555" alt="QR containing a two-second video and sound; use the Video QR decoder" /><span>Download QR ↓</span></a></article>
+    <details><summary>Earlier single-QR results</summary><p>The previous experiment recorded a 3-second color clip with sound at 40 × 29 (2,915 bytes), and an audio-priority version at 24 × 17 (2,775 bytes). Their original QR files have not yet been recovered, so compatibility with this app is unverified.</p></details>
+  </section>
+</BaseLayout>
+<style>
+  .intro { padding-block: clamp(3rem, 9vw, 7rem) 3rem; }.back { display: inline-block; font-size: .8rem; margin-bottom: 2.5rem; color: var(--muted); }.lede { max-width: 49ch; color: var(--muted); font-size: 1.2rem; }.button { display: inline-block; padding: .85rem 1.3rem; background: var(--ink); color: var(--paper); }.button:hover { background: var(--accent); }.platforms { font-size: .75rem; margin-top: .8rem; color: var(--muted); }
+  .examples { padding-bottom: 5rem; }.section-heading { padding-top: 2rem; border-top: 1px solid var(--line); }.section-heading > p:last-child { color: var(--muted); font-size: .8rem; }.section-heading a { text-decoration: underline; }.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }.screen { aspect-ratio: 8 / 5; background: #161813; display: grid; place-items: center; margin-bottom: 1.5rem; overflow: hidden; }.screen video,.screen img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }.caption { color: var(--muted); font-size: .8rem; max-width: 55ch; }article > p { margin-bottom: .6rem; }article .eyebrow { margin-top: 1rem; }
+  .qr-demo { border-block: 1px solid var(--line); margin-block: 2.5rem 1rem; padding-block: 2rem; display: grid; grid-template-columns: 1fr minmax(260px, 400px); align-items: center; gap: 3rem; }.qr-demo video { width: 240px; max-width: 100%; image-rendering: pixelated; }.qr-demo a { text-align: center; font-size: .8rem; }.qr-demo img { width: 100%; }details { max-width: 70ch; font-size: .85rem; color: var(--muted); }summary { cursor: pointer; padding-block: .8rem; }a:focus-visible,summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  @media(max-width: 650px) { .grid,.qr-demo { grid-template-columns: 1fr; }.qr-demo { gap: 1rem; } }
+  @media(prefers-reduced-motion: reduce) { .screen img { visibility: hidden; }.screen:has(img)::after { content: 'Animated GIF preview hidden for reduced motion'; color: white; padding: 1rem; position: absolute; }.screen { position: relative; } }
+</style>

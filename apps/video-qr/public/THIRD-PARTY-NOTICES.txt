@@ -1,0 +1,42 @@
+Video QR — third-party components
+
+The FFmpeg JavaScript wrapper and utilities are MIT licensed (Jerome Wu and
+contributors). @ffmpeg/core 0.12.10 is GPL-2.0-or-later, as declared by its
+installed package.json. It is the single-thread upstream binary, unmodified.
+The wrapper's MIT license does NOT replace the compiled core's GPL license.
+The core includes GPL codecs, including x264 used by our MP4 fallback.
+
+Source and build recipes:
+https://github.com/ffmpegwasm/ffmpeg.wasm
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/main/build
+https://ffmpegwasm.netlify.app/docs/overview/
+https://www.npmjs.com/package/@ffmpeg/core/v/0.12.10
+
+FFmpeg source (upstream version n5.1.4), licenses and legal information:
+https://github.com/FFmpeg/FFmpeg/tree/n5.1.4
+https://ffmpeg.org/legal.html
+https://github.com/FFmpeg/FFmpeg/blob/n5.1.4/COPYING.GPLv2
+Full GPLv2 text is bundled at licenses/FFmpeg-GPLv2.txt.
+
+Codec source and licensing:
+- x264 (GPL-2.0-or-later): https://code.videolan.org/videolan/x264
+  https://code.videolan.org/videolan/x264/-/blob/master/COPYING
+- libvpx / VP8 (BSD-style): https://chromium.googlesource.com/webm/libvpx/
+  https://chromium.googlesource.com/webm/libvpx/+/refs/heads/main/LICENSE
+- Opus (BSD-style): https://github.com/xiph/opus
+  https://github.com/xiph/opus/blob/main/COPYING
+- AAC encoder: part of FFmpeg, see its source and license above.
+The prebuilt core also includes libraries not invoked by this app; its full
+library list and build configuration are maintained in the upstream sources.
+
+qrcode 1.5.4 (MIT): https://github.com/soldair/node-qrcode
+jsQR 1.4.0 (Apache-2.0): https://github.com/cozmo/jsQR
+Capacitor core, Android, iOS, Filesystem and Share (MIT):
+https://github.com/ionic-team/capacitor
+https://github.com/ionic-team/capacitor-plugins
+
+Retain these notices and bundled licenses with redistributed copies. The links
+identify upstream sources; they are not a claim that source-link notices alone
+satisfy every GPL distribution obligation. Store publication/signing and review
+of GPL/source distribution obligations remain release responsibilities.

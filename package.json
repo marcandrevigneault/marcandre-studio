@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run build:video-qr && astro build",
+    "build:video-qr": "npm --prefix apps/video-qr ci && npm --prefix apps/video-qr run build && node scripts/stage-video-qr.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
