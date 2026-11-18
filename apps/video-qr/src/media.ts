@@ -1,7 +1,7 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { MAX_VIDEO_BYTES } from './packet';
 
-export type CompressionOptions = { start: number; duration: number; width: number; fps: number; audioKbps: number; colorMode?: 'color' | 'grayscale'; colorLevels?: 0 | 2 | 4 | 8; volume?: number };
+export type CompressionOptions = { start: number; duration: number; width: number; fps: number; audioKbps: number; colorMode?: 'color' | 'grayscale'; colorLevels?: 0 | 2 | 4 | 8; volume?: number; saturation?: number };
 export const MAX_INPUT_BYTES = 100 * 1024 * 1024;
 export const MAX_DURATION = 10;
 type Job = { engine: FFmpeg; cancelled: boolean };
@@ -15,6 +15,7 @@ function validate(options: CompressionOptions): void {
       !Number.isInteger(options.width) || options.width < 16 || options.width > 640 || options.width % 2 !== 0 ||
       options.fps < 1 || options.fps > 30 || options.audioKbps < 0 || options.audioKbps > 128 ||
       (options.colorMode !== undefined && !['color', 'grayscale'].includes(options.colorMode)) ||
+      (options.saturation !== undefined && (!Number.isFinite(options.saturation) || options.saturation < 0 || options.saturation > 2)) ||
       (options.colorLevels !== undefined && ![0, 2, 4, 8].includes(options.colorLevels)) ||
       (options.volume !== undefined && (!Number.isFinite(options.volume) || options.volume < 0 || options.volume > 1))) {
     throw new Error('Invalid settings: duration ≤10s, even width 16–640px, fps 1–30, audio 0–128 kbps, nonnegative start.');
@@ -64,6 +65,7 @@ export async function compressVideo(file: File, options: CompressionOptions, onP
     ...(options.audioKbps <= 8 ? ['-ar','8000','-application','voip','-frame_duration','60','-vbr','off'] : [])];
   const filters = [`scale=${options.width}:-2`, `fps=${options.fps}`];
   if (options.colorMode === 'grayscale') filters.push('hue=s=0');
+  else if (options.saturation !== undefined && options.saturation !== 1) filters.push(`hue=s=${options.saturation}`);
   if (options.colorLevels) {
     const step = 255 / (options.colorLevels - 1);
     const expression = `round(val/${step})*${step}`;

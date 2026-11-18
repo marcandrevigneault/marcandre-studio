@@ -21,9 +21,9 @@ describe('single QR fitting', () => {
 });
 
 it('retains image and sound choices through fitting', () => {
-  const requested = {duration:6,width:96,fps:8,audioKbps:8,colorMode:'grayscale' as const,colorLevels:4 as const,volume:.5};
+  const requested = {duration:6,width:96,fps:8,audioKbps:8,colorMode:'grayscale' as const,colorLevels:4 as const,volume:.5,saturation:1.8};
   for (const result of [fitEstimate(requested, 'colorLevels'), nextSmaller(requested)]) {
-    expect(result).toMatchObject({colorMode:'grayscale',colorLevels:4,volume:.5});
+    expect(result).toMatchObject({colorMode:'grayscale',colorLevels:4,volume:.5,saturation:1.8});
   }
   expect(estimateBytes({...requested,volume:0})).toBeLessThan(estimateBytes(requested));
 });

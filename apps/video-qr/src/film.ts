@@ -30,6 +30,8 @@ const copy = {
   colorMode: ['Image', 'Image'], color: ['Couleur', 'Color'], grayscale: ['Noir et blanc', 'Black & white'],
   colorLevels: ['Palette avant encodage', 'Palette before encoding'], fullPalette: ['Complète', 'Full'],
   colors: ['{count} couleurs', '{count} colors'], grayLevels: ['{count} niveaux de gris', '{count} gray levels'],
+  saturation: ['Vivacité des couleurs', 'Color vividness'],
+  saturationHint: ['100 % : couleurs d’origine · 200 % : plus vives.', '100%: original colors · 200%: more vivid.'],
   audioEnabled: ['Son activé', 'Sound enabled'], volume: ['Volume', 'Volume'],
   expandQR: ['Agrandir le code QR', 'Enlarge QR code'], close: ['Fermer', 'Close'],
   qrLabel: ['Code QR de l’extrait', 'Clip QR code'],
@@ -75,7 +77,7 @@ const t = (key: Key, params: Record<string, string | number> = {}) =>
   copy[key][language === 'fr' ? 0 : 1].replace(/\{(\w+)\}/g, (match, name: string) => String(params[name] ?? match));
 const number = (value: number) => value.toLocaleString(language === 'fr' ? 'fr-CA' : 'en-CA');
 let message: () => string = () => t('loading');
-let settings: FilmSettings = fitEstimate({ duration: 2, width: 32, fps: 2, audioKbps: 4, colorMode: 'color', colorLevels: 0, volume: 1 }, 'duration');
+let settings: FilmSettings = fitEstimate({ duration: 2, width: 32, fps: 2, audioKbps: 4, colorMode: 'color', colorLevels: 0, volume: 1, saturation: 1 }, 'duration');
 let previousAudioKbps = 4;
 let previousVolume = 1;
 let start = 600;
@@ -106,8 +108,13 @@ function renderValues() {
   el('volume-value').textContent = volume ? volume + ' %' : t('silent');
   input('volume').setAttribute('aria-valuetext', el('volume-value').textContent!);
   input('audio-enabled').checked = settings.audioKbps > 0 && volume > 0;
-  // Keep source listening consistent with the requested clip. Color processing applies on generation.
-  source.style.filter = settings.colorMode === 'grayscale' ? 'grayscale(1)' : '';
+  const saturation = Math.round((settings.saturation ?? 1) * 100);
+  input('saturation').value = String(saturation);
+  input('saturation').disabled = settings.colorMode === 'grayscale';
+  el('saturation-value').textContent = (settings.colorMode === 'grayscale' ? 0 : saturation) + ' %';
+  input('saturation').setAttribute('aria-valuetext', saturation + ' %');
+  // The source filter is an immediate approximation; the encoded preview includes the actual processing.
+  source.style.filter = settings.colorMode === 'grayscale' ? 'grayscale(1)' : `saturate(${settings.saturation ?? 1})`;
   source.muted = !input('audio-enabled').checked;
   source.volume = settings.volume ?? 1;
   input('start').value = String(start);
@@ -200,6 +207,9 @@ el<HTMLSelectElement>('colorMode').onchange = () => {
 el<HTMLSelectElement>('colorLevels').onchange = () => {
   const colorLevels = Number(el<HTMLSelectElement>('colorLevels').value) as 0 | 2 | 4 | 8;
   changeExtra({ ...settings, colorLevels }, 'colorLevels');
+};
+input('saturation').oninput = () => {
+  changeExtra({ ...settings, saturation: Number(input('saturation').value) / 100 }, 'saturation');
 };
 input('audio-enabled').onchange = () => {
   const enabled = input('audio-enabled').checked;

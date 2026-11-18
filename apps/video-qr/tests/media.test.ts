@@ -65,3 +65,22 @@ it('converts unsupported WebM to MP4 and checks exec failure', async () => {
   expect(engine.instances[0].args).toContain('libx264'); expect(engine.instances[0].terminated).toBe(true);
   engine.exit=1; await expect(playableVideo(new Uint8Array([1,2,3]))).rejects.toThrow();
 });
+it('applies color vividness before palette reduction in the encoded clip', async () => {
+  await compressVideo(file(), {...options, saturation: 1.8, colorLevels: 4});
+  const args = engine.instances[0].args;
+  const filters = args[args.indexOf('-vf') + 1];
+  expect(filters).toContain('hue=s=1.8');
+  expect(filters.indexOf('hue=s=1.8')).toBeLessThan(filters.indexOf('lutrgb='));
+});
+it('keeps monochrome independent of vividness and leaves default colors unchanged', async () => {
+  await compressVideo(file(), {...options, saturation: 2, colorMode: 'grayscale'});
+  let args = engine.instances[0].args;
+  expect(args[args.indexOf('-vf') + 1]).toBe('scale=96:-2,fps=6,hue=s=0');
+  await compressVideo(file(), options);
+  args = engine.instances[1].args;
+  expect(args[args.indexOf('-vf') + 1]).toBe('scale=96:-2,fps=6');
+});
+it.each([-1, 2.01, NaN, Infinity])('rejects invalid saturation %s before loading WASM', async saturation => {
+  await expect(compressVideo(file(), {...options, saturation})).rejects.toThrow();
+  expect(engine.instances).toHaveLength(0);
+});

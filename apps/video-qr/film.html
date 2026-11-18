@@ -31,6 +31,8 @@
             <label for="colorMode"><span data-copy="colorMode">Image</span><select id="colorMode"><option value="color" data-copy="color">Couleur</option><option value="grayscale" data-copy="grayscale">Noir et blanc</option></select></label>
             <label for="colorLevels"><span data-copy="colorLevels">Palette avant encodage</span><select id="colorLevels"><option value="0">Complète</option><option value="2">8 couleurs</option><option value="4">64 couleurs</option><option value="8">512 couleurs</option></select></label>
           </div>
+          <div class="setting vividness-setting"><label for="saturation" data-copy="saturation">Vivacité des couleurs</label><output id="saturation-value" for="saturation">100 %</output><input id="saturation" type="range" min="0" max="200" step="5" value="100" aria-describedby="saturation-hint"></div>
+          <p id="saturation-hint" class="hint settings-hint" data-copy="saturationHint">100 % : couleurs d’origine · 200 % : plus vives.</p>
           <div class="sound-row">
             <label class="sound-toggle" for="audio-enabled"><input id="audio-enabled" type="checkbox" checked><span data-copy="audioEnabled">Son activé</span></label>
             <div class="setting volume-setting"><label for="volume" data-copy="volume">Volume</label><output id="volume-value" for="volume">100 %</output><input id="volume" type="range" min="0" max="100" step="1" value="100"></div>

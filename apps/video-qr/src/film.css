@@ -21,3 +21,5 @@ dialog{width:min(90vw,591px);max-width:calc(100vw - 24px);max-height:calc(100dvh
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
 .embedded .languages{display:none}
+
+.vividness-setting{padding-top:8px;border-top:1px solid var(--line);margin-top:5px}.vividness-setting input:disabled{opacity:.4;cursor:not-allowed}
