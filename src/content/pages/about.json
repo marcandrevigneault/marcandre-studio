@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "id": "about-intro",
+      "type": "hero",
+      "title": {
+        "fr": "Marc-André Vigneault",
+        "en": "Marc-André Vigneault"
+      },
+      "text": {
+        "fr": "",
+        "en": ""
+      },
+      "eyebrow": {
+        "fr": "À propos",
+        "en": "About"
+      },
+      "buttonLabel": {
+        "fr": "",
+        "en": ""
+      },
+      "src": "",
+      "alt": {
+        "fr": "",
+        "en": ""
+      },
+      "href": "",
+      "backgroundImage": "",
+      "color": "",
+      "background": "",
+      "padding": 96,
+      "align": "left",
+      "width": "normal",
+      "columns": 2,
+      "items": []
+    },
+    {
+      "id": "about-text",
+      "type": "text",
+      "title": {
+        "fr": "",
+        "en": ""
+      },
+      "text": {
+        "fr": "Je suis quelqu'un. Mais pas vraiment.\n\nAvec mon temps prêté ici sur Terre, j’aime créer et explorer : explorer les relations, explorer les humain (mon espèce) et les observer. Observer la terre et ses habitants à travers la photographie, le vidéo, le voyage, la musique et, à l’occasion, la poésie. J'ai aussi un passé d'ingénieur et d'académique, alors j'ai des intérêts pour la technologie et pour comprendre comment les choses fonctionnent. Ce studio rassemble tout ça.\n\n\n\nÉcrivez-moi un mot, ou prenez simplement le temps d’explorer.",
+        "en": "I'm a maker with a wide field of view — photography, video, science, travel, and the occasional poem. This is where those threads live together.\n\nBy day I'm drawn to how things work; by light I'm drawn to how they look. The science writing here is my attempt to explain ideas clearly — from hydroponics to optics — and the galleries are where I let images simply be.\n\nSay hello — or just look around."
+      },
+      "eyebrow": {
+        "fr": "",
+        "en": ""
+      },
+      "buttonLabel": {
+        "fr": "",
+        "en": ""
+      },
+      "src": "",
+      "alt": {
+        "fr": "",
+        "en": ""
+      },
+      "href": "",
+      "backgroundImage": "",
+      "color": "",
+      "background": "",
+      "padding": 0,
+      "align": "left",
+      "width": "normal",
+      "columns": 2,
+      "items": []
+    },
+    {
+      "id": "about-links",
+      "type": "columns",
+      "title": {
+        "fr": "",
+        "en": ""
+      },
+      "text": {
+        "fr": "",
+        "en": ""
+      },
+      "eyebrow": {
+        "fr": "",
+        "en": ""
+      },
+      "buttonLabel": {
+        "fr": "",
+        "en": ""
+      },
+      "src": "",
+      "alt": {
+        "fr": "",
+        "en": ""
+      },
+      "href": "",
+      "backgroundImage": "",
+      "color": "",
+      "background": "",
+      "padding": 32,
+      "align": "left",
+      "width": "normal",
+      "columns": 2,
+      "items": [
+        {
+          "id": "about-email",
+          "title": {
+            "fr": "Courriel",
+            "en": "Email"
+          },
+          "text": {
+            "fr": "",
+            "en": ""
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "mailto:marcandre.vigneault.96@gmail.com",
+          "disabled": false
+        },
+        {
+          "id": "about-github",
+          "title": {
+            "fr": "GitHub",
+            "en": "GitHub"
+          },
+          "text": {
+            "fr": "",
+            "en": ""
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "https://github.com/marcandrevigneault",
+          "disabled": false
+        }
+      ]
+    }
+  ]
+}
