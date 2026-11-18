@@ -46,7 +46,7 @@ function initialize(root: HTMLElement) {
   }
   async function open() {
     if (busy || !form.hidden) return;
-    if (!authenticated) { login.hidden = false; loginLink(); message(say('Connectez-vous avec « Modifier cette page » pour éditer ce texte.', 'Sign in using “Edit this page” to edit this text.')); login.focus(); return; }
+    if (!authenticated) return;
     if (document.querySelector('[data-editor-active]')) { message(say('Enregistrez ou annulez le texte déjà ouvert avant d’en modifier un autre.', 'Save or cancel the open text before editing another section.')); return; }
     root.dataset.editorActive = 'true';
     editLanguage = language(); setBusy(true); message(say('Chargement de la dernière version…', 'Loading the latest version…'));
@@ -111,5 +111,5 @@ function initialize(root: HTMLElement) {
       const requested = new URL(location.href).searchParams.get('edit');
       if (requested === root.dataset.articleEditor || (requested === '1' && !root.closest('[data-editable-region]'))) void open();
     }
-  }).catch(() => { /* The sign-in link remains usable if the session check fails. */ });
+  }).catch(() => { /* Editing stays hidden unless an administrator session is confirmed. */ });
 }

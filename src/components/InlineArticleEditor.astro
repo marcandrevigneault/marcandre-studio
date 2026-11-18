@@ -5,7 +5,7 @@ const { slug, pagePath = `/science/${Astro.props.slug}/`, showLogin = true } = A
 ---
 <div class="inline-editor measure" data-article-editor={slug}>
   <div class="edit-bar">
-    <a class="editor-login" hidden={!showLogin} href={`/admin/login?returnTo=${encodeURIComponent(`${pagePath}?edit=${slug}`)}`}><Text fr="Modifier cette page" en="Edit this page" /></a>
+    <a class="editor-login" hidden href={`/admin/login?returnTo=${encodeURIComponent(`${pagePath}?edit=${slug}`)}`}><Text fr="Modifier cette page" en="Edit this page" /></a>
     <button type="button" class="editor-open" hidden><Text fr="Modifier · Markdown" en="Edit · Markdown" /></button>
     <span class="editor-hint" hidden><Text fr="Ou double-cliquez sur le texte." en="Or double-click the text." /></span>
   </div>
