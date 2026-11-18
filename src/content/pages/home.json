@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "id": "home-intro",
+      "type": "hero",
+      "title": {
+        "fr": "Un endroit pour partager\nce que j’aime créer.",
+        "en": "A studio for\nthings I love to make."
+      },
+      "text": {
+        "fr": "Si on veut me définir en mots, ça sera facile. Ingénieur · Scientifique · Musicien · Créateur · Naturaliste · Photographe · Sportif · Tendances Polymath. \n\nmais je préfères sensible, amoureux et humain. \n",
+        "en": "Photography, art, projects and scientific writing — each gathered here in its own light. Wander in."
+      },
+      "eyebrow": {
+        "fr": "UNE EXPÉRIENCE CONSCIENTE, COMME UNE AUTRE.",
+        "en": "Photographer · Scientist · Maker"
+      },
+      "buttonLabel": {
+        "fr": "",
+        "en": ""
+      },
+      "src": "",
+      "alt": {
+        "fr": "",
+        "en": ""
+      },
+      "href": "",
+      "backgroundImage": "",
+      "color": "",
+      "background": "",
+      "padding": 144,
+      "align": "left",
+      "width": "wide",
+      "columns": 2,
+      "items": []
+    },
+    {
+      "id": "home-sections",
+      "type": "cards",
+      "title": {
+        "fr": "",
+        "en": ""
+      },
+      "text": {
+        "fr": "",
+        "en": ""
+      },
+      "eyebrow": {
+        "fr": "",
+        "en": ""
+      },
+      "buttonLabel": {
+        "fr": "",
+        "en": ""
+      },
+      "src": "",
+      "alt": {
+        "fr": "",
+        "en": ""
+      },
+      "href": "",
+      "backgroundImage": "",
+      "color": "",
+      "background": "",
+      "padding": 0,
+      "align": "left",
+      "width": "wide",
+      "columns": 4,
+      "items": [
+        {
+          "id": "home-photo",
+          "title": {
+            "fr": "Photographie",
+            "en": "Photography"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "/photography/",
+          "disabled": true
+        },
+        {
+          "id": "home-art",
+          "title": {
+            "fr": "Art",
+            "en": "Art"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "/art/",
+          "disabled": true
+        },
+        {
+          "id": "home-projects",
+          "title": {
+            "fr": "Projets",
+            "en": "Projects"
+          },
+          "text": {
+            "fr": "Des expériences à essayer",
+            "en": "Experiments you can try"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "/projects/",
+          "disabled": false
+        },
+        {
+          "id": "home-science",
+          "title": {
+            "fr": "Science",
+            "en": "Science"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "/science/",
+          "disabled": true
+        },
+        {
+          "id": "home-video",
+          "title": {
+            "fr": "Vidéo",
+            "en": "Video"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "",
+          "disabled": true
+        },
+        {
+          "id": "home-poetry",
+          "title": {
+            "fr": "Poésie",
+            "en": "Poetry"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "",
+          "disabled": true
+        },
+        {
+          "id": "home-travel",
+          "title": {
+            "fr": "Voyage",
+            "en": "Travel"
+          },
+          "text": {
+            "fr": "À venir",
+            "en": "Coming soon"
+          },
+          "src": "",
+          "alt": {
+            "fr": "",
+            "en": ""
+          },
+          "href": "",
+          "disabled": true
+        }
+      ]
+    }
+  ]
+}
