@@ -156,3 +156,6 @@ img { display: block; max-width: 100%; height: auto; }
   }
   [data-reveal] { opacity: 1; transform: none; }
 }
+
+html[lang="fr"] [data-language-content="en"],
+html[lang="en"] [data-language-content="fr"] { display: none; }

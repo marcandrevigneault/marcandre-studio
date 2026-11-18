@@ -1,5 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
+import Text from '../../components/Text.astro';
+import { frenchText } from '../../lib/content-translations';
 import GalleryLayout from '../../layouts/GalleryLayout.astro';
 
 export async function getStaticPaths() {
@@ -12,8 +14,11 @@ export async function getStaticPaths() {
 
 const { gallery } = Astro.props;
 const { Content } = await render(gallery);
+// Existing gallery bodies are a single introduction; keep arbitrary future Markdown intact.
+const intro = gallery.body?.trim().match(/^<p class="intro">([\s\S]*?)<\/p>$/)?.[1]?.trim();
+const translatedIntro = intro ? frenchText(intro) : undefined;
 ---
 
 <GalleryLayout gallery={gallery}>
-  <Content />
+  {intro && translatedIntro !== intro ? <Text as="p" class="intro" fr={translatedIntro!} en={intro} /> : <Content />}
 </GalleryLayout>

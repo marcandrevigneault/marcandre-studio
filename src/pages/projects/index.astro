@@ -1,19 +1,20 @@
 ---
+import Text from '../../components/Text.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Projects" description="Small experiments, working tools, and things worth trying.">
-  <header class="wrap intro"><p class="eyebrow">Projects</p><h1>Ideas, put to work.</h1><p>Small experiments. Unexpected possibilities.</p></header>
+<BaseLayout title="Projets" titleEn="Projects" description="Des expériences, des outils concrets et des idées à essayer." descriptionEn="Small experiments, working tools, and things worth trying.">
+  <header class="wrap intro"><p class="eyebrow"><Text fr="Projets" en="Projects" /></p><h1><Text fr="Des idées qui prennent forme." en="Ideas, put to work." /></h1><p><Text fr="De petites expériences. Des possibilités inattendues." en="Small experiments. Unexpected possibilities." /></p></header>
   <section class="wrap projects">
     <a class="project" href="/projects/video-qr/">
-      <div class="visual"><img src="/examples/video-qr/poster.png" width="768" height="480" alt="A pixelated frame from La Bête lumineuse" /><span>VIDEO → QR → VIDEO</span></div>
-      <div><p class="eyebrow">01 / Video & creative technology</p><h2>A little cinema in a QR.</h2><p>Compress a clip. Scan the code. Watch it come back.</p><span class="cta">Explore Video QR →</span></div>
+      <div class="visual"><img src="/examples/video-qr/poster.png" width="768" height="480" alt="Une image pixellisée de La Bête lumineuse" data-i18n-fr-alt="Une image pixellisée de La Bête lumineuse" data-i18n-en-alt="A pixelated frame from La Bête lumineuse" /><span><Text fr="VIDÉO → QR → VIDÉO" en="VIDEO → QR → VIDEO" /></span></div>
+      <div><p class="eyebrow"><Text fr="01 / Vidéo et création technologique" en="01 / Video &amp; creative technology" /></p><h2><Text fr="Un peu de cinéma dans un QR." en="A little cinema in a QR." /></h2><p><Text fr="Compressez un extrait. Scannez le code. Retrouvez la vidéo." en="Compress a clip. Scan the code. Watch it come back." /></p><span class="cta"><Text fr="Découvrir Vidéo QR →" en="Explore Video QR →" /></span></div>
     </a>
   </section>
 </BaseLayout>
 <style>
   .intro { padding-block: clamp(3rem, 10vw, 6rem) 2rem; }.intro > p:last-child { color: var(--muted); }
   .projects { padding-bottom: 5rem; }.project { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; padding-block: 2rem; border-top: 1px solid var(--line); }
-  .visual { background: #24271e; position: relative; overflow: hidden; }.visual img { width: 100%; image-rendering: pixelated; opacity: .8; }.visual span { position: absolute; bottom: 1rem; left: 1rem; color: white; font: .75rem var(--font-mono); letter-spacing: .15em; }
+  .visual { background: #24271e; position: relative; overflow: hidden; }.visual img { width: 100%; image-rendering: pixelated; opacity: .8; }.visual > span { position: absolute; bottom: 1rem; left: 1rem; color: white; font: .75rem var(--font-mono); letter-spacing: .15em; }
   .project p:not(.eyebrow) { color: var(--muted); }.cta { color: var(--accent); }.project:hover h2 { color: var(--accent); }
   @media(max-width: 650px) { .project { grid-template-columns: 1fr; } }
 </style>

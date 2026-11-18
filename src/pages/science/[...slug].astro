@@ -10,10 +10,15 @@ export async function getStaticPaths() {
   }));
 }
 
+const translations = import.meta.glob('../../content-translations/fr/*.mdx', { eager: true });
 const { article } = Astro.props;
+const FrenchContent = (translations[`../../content-translations/fr/${article.id}.mdx`] as { default: any } | undefined)?.default;
 const { Content } = await render(article);
 ---
 
 <ArticleLayout article={article}>
-  <Content />
+  {FrenchContent ? (<>
+    <div data-language-content="fr" lang="fr"><FrenchContent /></div>
+    <div data-language-content="en" lang="en"><Content /></div>
+  </>) : <Content />}
 </ArticleLayout>

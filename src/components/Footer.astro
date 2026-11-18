@@ -1,12 +1,13 @@
 ---
+import Text from './Text.astro';
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="wrap">
     <p class="sig">Marc&#8209;André Vigneault</p>
-    <p class="note">Photography · Art · Projects · Science — made with care.</p>
-    <p class="meta">© {year} · Built with Astro</p>
+    <p class="note"><Text fr="Photographie · Art · Projets · Science — fait avec soin." en="Photography · Art · Projects · Science — made with care." /></p>
+    <p class="meta">© {year} · <Text fr="Créé avec Astro" en="Built with Astro" /></p>
   </div>
 </footer>
 

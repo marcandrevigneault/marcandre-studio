@@ -7,14 +7,17 @@ import 'katex/dist/katex.min.css';
 interface Props {
   title: string;
   description?: string;
+  titleEn?: string;
+  descriptionEn?: string;
   /** Hide the global nav (e.g. immersive gallery pages render their own). */
   bareNav?: boolean;
   /** Hide the global footer (e.g. the admin, which is its own world). */
   bareFooter?: boolean;
 }
 
-const { title, description = 'Photography, art, projects, and science by Marc-André Vigneault.', bareNav = false, bareFooter = false } = Astro.props;
+const { title, titleEn = title, description = 'Photographie, art, projets et science par Marc-André Vigneault.', descriptionEn = 'Photography, art, projects, and science by Marc-André Vigneault.', bareNav = false, bareFooter = false } = Astro.props;
 const siteName = 'Marc-André Vigneault';
+const fullTitleEn = titleEn === siteName ? titleEn : `${titleEn} — ${siteName}`;
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 // Astro.site is undefined when this layout is rendered via experimental_AstroContainer
 // (e.g. the admin live preview at /api/preview) — the installed astro version never
@@ -24,17 +27,17 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
 ---
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="fr" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <title data-i18n-fr={fullTitle} data-i18n-en={fullTitleEn}>{fullTitle}</title>
+    <meta name="description" content={description} data-i18n-fr-content={description} data-i18n-en-content={descriptionEn} />
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={fullTitle} data-i18n-fr-content={fullTitle} data-i18n-en-content={fullTitleEn} />
+    <meta property="og:description" content={description} data-i18n-fr-content={description} data-i18n-en-content={descriptionEn} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
@@ -49,6 +52,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
       <slot />
     </main>
     {!bareFooter && <Footer />}
+    <script src="../scripts/language.ts"></script>
     <script src="../scripts/motion.js"></script>
   </body>
 </html>

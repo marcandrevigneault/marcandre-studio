@@ -1,5 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Text from '../components/Text.astro';
+import { frenchText } from '../lib/content-translations';
 import AmbientAudio from '../components/AmbientAudio.astro';
 import GalleryBlocks from '../components/GalleryBlocks.astro';
 import { normalizeToBlocks } from '../lib/blocks';
@@ -28,10 +30,11 @@ const styleAttr = Object.entries(vars)
   .join(';');
 
 const validDate = data.date instanceof Date && !isNaN(data.date.getTime());
+const dateTextFr = validDate ? data.date.toLocaleDateString('fr-CA', { year: 'numeric', month: 'long' }) : 'Brouillon — sans date';
 const dateText = validDate ? data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Draft — no date yet';
 ---
 
-<BaseLayout title={data.title} description={data.summary}>
+<BaseLayout title={frenchText(data.title)} description={frenchText(data.summary)} titleEn={data.title} descriptionEn={data.summary}>
   <article
     class="gallery"
     style={styleAttr}
@@ -41,9 +44,9 @@ const dateText = validDate ? data.date.toLocaleDateString('en-US', { year: 'nume
   >
     <header class="hero" style={`--cover: url('${data.cover}')`}>
       <div class="hero-inner wrap">
-        <p class="eyebrow" data-reveal>{data.place ?? 'Gallery'} · {dateText}</p>
-        <h1 data-reveal="1">{data.title}</h1>
-        <p class="lede measure" data-reveal="2">{data.summary}</p>
+        <p class="eyebrow" data-reveal><Text fr={frenchText(data.place ?? 'Gallery')} en={data.place ?? 'Gallery'} /> · <Text fr={dateTextFr} en={dateText} /></p>
+        <h1 data-reveal="1"><Text fr={frenchText(data.title)} en={data.title} /></h1>
+        <p class="lede measure" data-reveal="2"><Text fr={frenchText(data.summary)} en={data.summary} /></p>
       </div>
       <div class="scrim"></div>
     </header>
@@ -54,7 +57,7 @@ const dateText = validDate ? data.date.toLocaleDateString('en-US', { year: 'nume
     </div>
 
     <p class="back wrap">
-      <a href="/photography/">← All galleries</a>
+      <a href="/photography/"><Text fr="← Toutes les galeries" en="← All galleries" /></a>
     </p>
   </article>
 

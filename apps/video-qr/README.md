@@ -92,3 +92,22 @@ The debug build passed using Temurin JDK 21 and API 36. APK: `android/app/build/
 See [THIRD-PARTY-NOTICES.txt](public/THIRD-PARTY-NOTICES.txt) and [bundled license texts](public/licenses/). The npm package declares **@ffmpeg/core 0.12.10 GPL-2.0-or-later**; its MIT JavaScript wrapper does not change that. The prebuilt core includes x264 and other codecs. Upstream source and build recipes, FFmpeg source, and codec licensing links are included in the notices. Retain notices and fulfill the applicable source-distribution obligations when redistributing the core; these links alone are not a complete legal compliance determination.
 
 At implementation time, `npm audit --omit=dev` reported zero vulnerabilities. Full audit reported five high findings through the development-only `picomatch` dependency chain (Vite/Vitest); no patched current version was available, and no forced major downgrade was applied.
+
+## Film passage generator
+
+The studio project page embeds `film.html`, a second Vite entry. It uses the
+compressed full-film asset at `/examples/video-qr/la-bete-lumineuse.webm` on the
+studio host. To run the embedded experience locally, run the root
+`npm run build:video-qr` followed by the root `npm run dev`, then open
+`/projects/video-qr/`.
+
+The large position slider selects a passage; duration, width, frame rate, and
+audio sliders share an estimated byte budget. Generation measures actual WebM
+bytes and progressively reduces settings until the clip fits in one packet
+(2,905 video bytes plus the 48-byte header), with a bounded retry count.
+Only validated single-packet results can be downloaded. Changing a setting or
+cancelling invalidates the previous result. Compression runs in the browser.
+
+Both interfaces default to French and share the `studio-language` preference
+with the site; `?lang=fr` or `?lang=en` explicitly selects a language. The recovered
+QMV1 QR shown as example 02 is a legacy format, separate from generated VQR packets.

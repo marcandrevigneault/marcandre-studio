@@ -1,25 +1,26 @@
 ---
+import Text from '../components/Text.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="About" description="About Marc-André Vigneault.">
+<BaseLayout title="À propos" titleEn="About" description="À propos de Marc-André Vigneault." descriptionEn="About Marc-André Vigneault.">
   <section class="about measure">
-    <p class="eyebrow" data-reveal>About</p>
-    <h1 data-reveal="1">Marc-André Vigneault</h1>
+    <p class="eyebrow" data-reveal><Text fr="À propos" en="About" /></p>
+    <h1 data-reveal="1"><Text fr="Marc-André Vigneault" en="Marc-André Vigneault" /></h1>
     <div class="prose" data-reveal="2">
       <p>
-        I'm a maker with a wide field of view — photography, video, science, travel, and the
-        occasional poem. This is where those threads live together.
+        <Text fr="J’aime créer et explorer : photographie, vidéo, science, voyage et, à l’occasion, poésie. Ce studio rassemble tout ça." en="I&#x27;m a maker with a wide field of view — photography, video, science, travel, and the
+        occasional poem. This is where those threads live together." />
       </p>
       <p>
-        By day I'm drawn to how things work; by light I'm drawn to how they look. The science
+        <Text fr="J’aime comprendre comment les choses fonctionnent, autant qu’observer la lumière qui les révèle. Mes textes rendent la science accessible, de l’hydroponie à l’optique. Dans les galeries, je laisse les images parler." en="By day I&#x27;m drawn to how things work; by light I&#x27;m drawn to how they look. The science
         writing here is my attempt to explain ideas clearly — from hydroponics to optics — and
-        the galleries are where I let images simply be.
+        the galleries are where I let images simply be." />
       </p>
-      <p>Say hello — or just look around.</p>
+      <p><Text fr="Écrivez-moi un mot, ou prenez simplement le temps d’explorer." en="Say hello — or just look around." /></p>
       <ul class="links">
-        <li><a href="mailto:marcandre.vigneault.96@gmail.com">Email</a></li>
-        <li><a href="https://github.com/marcandrevigneault" rel="me">GitHub</a></li>
+        <li><a href="mailto:marcandre.vigneault.96@gmail.com"><Text fr="Courriel" en="Email" /></a></li>
+        <li><a href="https://github.com/marcandrevigneault" rel="me"><Text fr="GitHub" en="GitHub" /></a></li>
       </ul>
     </div>
   </section>

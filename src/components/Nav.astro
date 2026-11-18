@@ -1,29 +1,38 @@
 ---
+import Text from './Text.astro';
 const path = Astro.url.pathname;
 const links = [
-  { href: '/photography/', label: 'Photography' },
-  { href: '/art/', label: 'Art' },
-  { href: '/projects/', label: 'Projects' },
-  { href: '/science/', label: 'Science' },
-  { href: '/about/', label: 'About' },
+  { href: '/photography/', label: 'Photographie', en: 'Photography' },
+  { href: '/art/', label: 'Art', en: 'Art' },
+  { href: '/projects/', label: 'Projets', en: 'Projects' },
+  { href: '/science/', label: 'Science', en: 'Science' },
+  { href: '/about/', label: 'À propos', en: 'About' },
 ];
 const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
 ---
 
 <header class="site-nav">
   <nav class="wrap">
-    <a href="/" class="brand" aria-label="Home">Marc&#8209;André&nbsp;Vigneault</a>
+    <a href="/" class="brand" aria-label="Accueil" data-i18n-fr-aria-label="Accueil" data-i18n-en-aria-label="Home">Marc&#8209;André&nbsp;Vigneault</a>
     <ul>
       {links.map((l) => (
         <li>
-          <a href={l.href} class:list={[{ active: isActive(l.href) }]}>{l.label}</a>
+          <a href={l.href} class:list={[{ active: isActive(l.href) }]}><Text fr={l.label} en={l.en} /></a>
         </li>
       ))}
     </ul>
+    <div class="languages" role="group" aria-label="Langue" data-i18n-fr-aria-label="Langue" data-i18n-en-aria-label="Language">
+      <button type="button" data-set-language="fr" aria-pressed="true" aria-label="Français">FR</button>
+      <button type="button" data-set-language="en" aria-pressed="false" aria-label="English">EN</button>
+    </div>
   </nav>
 </header>
 
 <style>
+  .languages { display: flex; gap: .2rem; }
+  .languages button { cursor: pointer; background: transparent; color: var(--muted); border: 1px solid transparent; padding: .35rem .45rem; font: inherit; font-size: .75rem; }
+  .languages button[aria-pressed="true"] { color: var(--ink); border-color: var(--line); }
+  .languages button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .site-nav {
     position: sticky;
     top: 0;

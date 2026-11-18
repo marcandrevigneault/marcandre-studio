@@ -1,5 +1,7 @@
 ---
+import Text from '../../components/Text.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { frenchText } from '../../lib/content-translations';
 import { getCollection } from 'astro:content';
 
 const published = (c: { data: { draft: boolean } }) => import.meta.env.DEV || !c.data.draft;
@@ -11,17 +13,17 @@ const articles = (await getCollection('articles', published)).sort(
 const topics = [...new Set(articles.flatMap((a) => a.data.topics))].sort();
 ---
 
-<BaseLayout title="Science" description="Essays and notes on hydroponics, optics, physics, and the things worth explaining.">
+<BaseLayout title="Science" description="Textes et notes sur l’hydroponie, l’optique, la physique et les idées à explorer." descriptionEn="Essays and notes on hydroponics, optics, physics, and the things worth explaining.">
   <header class="intro wrap">
-    <p class="eyebrow" data-reveal>Writing</p>
-    <h1 data-reveal="1">Science, explained plainly.</h1>
+    <p class="eyebrow" data-reveal><Text fr="Textes" en="Writing" /></p>
+    <h1 data-reveal="1"><Text fr="La science, tout simplement." en="Science, explained plainly." /></h1>
     <p class="lede measure" data-reveal="2">
-      Notes and essays on the things I'm learning and teaching — hydroponics, light, and
-      whatever else earns a closer look.
+      <Text fr="Des notes et des textes sur ce que j’apprends et ce que j’enseigne : l’hydroponie, la lumière et tout ce qui mérite qu’on s’y attarde." en="Notes and essays on the things I&#x27;m learning and teaching — hydroponics, light, and
+      whatever else earns a closer look." />
     </p>
     {topics.length > 0 && (
       <ul class="topics" data-reveal="3">
-        {topics.map((t) => <li>{t}</li>)}
+        {topics.map((t) => <li><Text fr={frenchText(t)} en={t} /></li>)}
       </ul>
     )}
   </header>
@@ -31,19 +33,19 @@ const topics = [...new Set(articles.flatMap((a) => a.data.topics))].sort();
       <li data-reveal={String(i % 5)}>
         <a href={`/science/${a.id}/`}>
           <p class="post-meta">
-            {a.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            {a.data.readingTime && <span> · {a.data.readingTime}</span>}
+            <Text fr={a.data.date.toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' })} en={a.data.date.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })} />
+            {a.data.readingTime && <span> · <Text fr={frenchText(a.data.readingTime)} en={a.data.readingTime} /></span>}
           </p>
-          <h2>{a.data.title}</h2>
-          <p class="post-summary">{a.data.summary}</p>
-          {a.data.topics.length > 0 && <p class="post-topics">{a.data.topics.join(' · ')}</p>}
+          <h2><Text fr={frenchText(a.data.title)} en={a.data.title} /></h2>
+          <p class="post-summary"><Text fr={frenchText(a.data.summary)} en={a.data.summary} /></p>
+          {a.data.topics.length > 0 && <p class="post-topics"><Text fr={a.data.topics.map(frenchText).join(' · ')} en={a.data.topics.join(' · ')} /></p>}
         </a>
       </li>
     ))}
   </ul>
 
   {articles.length === 0 && (
-    <p class="measure empty">No articles yet — add a <code>.mdx</code> file in <code>src/content/articles/</code>.</p>
+    <p class="measure empty"><Text fr="Les premiers articles arrivent bientôt." en="The first articles are coming soon." /></p>
   )}
 </BaseLayout>
 

@@ -1,4 +1,6 @@
 ---
+import Text from './Text.astro';
+import { frenchText } from '../lib/content-translations';
 import type { Block } from '../lib/gallery-schema';
 interface Props { blocks: Block[]; }
 const { blocks } = Astro.props;
@@ -7,32 +9,32 @@ const { blocks } = Astro.props;
   {blocks.map((b, i) => (
     <section class:list={['block', `l-${b.layout}`, { rtl: b.layout === 'image-text' && b.align === 'right' }]} data-reveal={String(i % 6)}>
       {b.layout === 'image-text' && b.text && (
-        <div class="prose"><p>{b.text}</p></div>
+        <div class="prose"><p><Text fr={frenchText(b.text)} en={b.text} /></p></div>
       )}
       {b.layout === 'carousel' ? (
         <div class="carousel" data-carousel>
           <div class="track">
             {b.images.map((img) => (
               <figure class="slide">
-                <button class="open" data-full={img.src} data-cap={img.caption ?? img.alt} aria-label={`View ${img.alt}`}>
-                  <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+                <button class="open" data-full={img.src} data-cap={frenchText(img.caption ?? img.alt)} data-cap-fr={frenchText(img.caption ?? img.alt)} data-cap-en={img.caption ?? img.alt} aria-label={`Voir : ${frenchText(img.alt)}`} data-i18n-fr-aria-label={`Voir : ${frenchText(img.alt)}`} data-i18n-en-aria-label={`View ${img.alt}`}>
+                  <img src={img.src} alt={frenchText(img.alt)} data-i18n-fr-alt={frenchText(img.alt)} data-i18n-en-alt={img.alt} loading="lazy" decoding="async" />
                 </button>
               </figure>
             ))}
           </div>
-          <button class="c-prev" data-prev aria-label="Previous">‹</button>
-          <button class="c-next" data-next aria-label="Next">›</button>
+          <button class="c-prev" data-prev aria-label="Précédente" data-i18n-fr-aria-label="Précédente" data-i18n-en-aria-label="Previous">‹</button>
+          <button class="c-next" data-next aria-label="Suivante" data-i18n-fr-aria-label="Suivante" data-i18n-en-aria-label="Next">›</button>
           <div class="dots" data-dots>
-            {b.images.map((_, di) => (<button class="dot" data-goto={String(di)} aria-label={`Slide ${di + 1}`}></button>))}
+            {b.images.map((_, di) => (<button class="dot" data-goto={String(di)} aria-label={`Image ${di + 1}`} data-i18n-fr-aria-label={`Image ${di + 1}`} data-i18n-en-aria-label={`Slide ${di + 1}`}></button>))}
           </div>
         </div>
       ) : (
         b.images.map((img) => (
           <figure class="cell">
-            <button class="open" data-full={img.src} data-cap={img.caption ?? img.alt} aria-label={`View ${img.alt}`}>
-              <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+            <button class="open" data-full={img.src} data-cap={frenchText(img.caption ?? img.alt)} data-cap-fr={frenchText(img.caption ?? img.alt)} data-cap-en={img.caption ?? img.alt} aria-label={`Voir : ${frenchText(img.alt)}`} data-i18n-fr-aria-label={`Voir : ${frenchText(img.alt)}`} data-i18n-en-aria-label={`View ${img.alt}`}>
+              <img src={img.src} alt={frenchText(img.alt)} data-i18n-fr-alt={frenchText(img.alt)} data-i18n-en-alt={img.alt} loading="lazy" decoding="async" />
             </button>
-            {img.caption && <figcaption>{img.caption}</figcaption>}
+            {img.caption && <figcaption><Text fr={frenchText(img.caption)} en={img.caption} /></figcaption>}
           </figure>
         ))
       )}
@@ -42,7 +44,7 @@ const { blocks } = Astro.props;
 
 <!-- Lightbox (ported from PhotoGrid.astro) -->
 <dialog class="lightbox" data-lightbox>
-  <button class="close" aria-label="Close" data-close>&times;</button>
+  <button class="close" aria-label="Fermer" data-i18n-fr-aria-label="Fermer" data-i18n-en-aria-label="Close" data-close>&times;</button>
   <figure><img alt="" data-lightbox-img /><figcaption data-lightbox-cap></figcaption></figure>
 </dialog>
 
@@ -56,8 +58,15 @@ const { blocks } = Astro.props;
       btn.addEventListener('click', () => {
         const el = btn as HTMLElement;
         img.src = el.dataset.full || '';
-        img.alt = el.dataset.cap || '';
-        cap.textContent = el.dataset.cap || '';
+        const fr = el.dataset.capFr || '';
+        const en = el.dataset.capEn || fr;
+        img.setAttribute('data-i18n-fr-alt', fr);
+        img.setAttribute('data-i18n-en-alt', en);
+        cap.setAttribute('data-i18n-fr', fr);
+        cap.setAttribute('data-i18n-en', en);
+        const caption = document.documentElement.lang === 'en' ? en : fr;
+        img.alt = caption;
+        cap.textContent = caption;
         dialog.showModal();
       });
     });

@@ -1,5 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Text from '../components/Text.astro';
+import { frenchText } from '../lib/content-translations';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -7,24 +9,25 @@ interface Props {
 }
 const { article } = Astro.props;
 const { data } = article;
+const dateTextFr = data.date.toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
 const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title={data.title} description={data.summary}>
+<BaseLayout title={frenchText(data.title)} description={frenchText(data.summary)} titleEn={data.title} descriptionEn={data.summary}>
   <article class="article">
     <header class="head measure">
       <p class="eyebrow">
-        {data.topics.join(' · ') || 'Notes'}
-        {data.readingTime && <span> · {data.readingTime}</span>}
+        <Text fr={data.topics.map(frenchText).join(' · ') || 'Notes'} en={data.topics.join(' · ') || 'Notes'} />
+        {data.readingTime && <span> · <Text fr={frenchText(data.readingTime)} en={data.readingTime} /></span>}
       </p>
-      <h1>{data.title}</h1>
-      {data.subtitle && <p class="subtitle">{data.subtitle}</p>}
-      <p class="byline">{dateText}</p>
+      <h1><Text fr={frenchText(data.title)} en={data.title} /></h1>
+      {data.subtitle && <p class="subtitle"><Text fr={frenchText(data.subtitle)} en={data.subtitle} /></p>}
+      <p class="byline"><Text fr={dateTextFr} en={dateText} /></p>
     </header>
 
     {data.cover && (
       <figure class="cover wrap">
-        <img src={data.cover} alt={data.title} loading="eager" />
+        <img src={data.cover} alt={frenchText(data.title)} data-i18n-fr-alt={frenchText(data.title)} data-i18n-en-alt={data.title} loading="eager" />
       </figure>
     )}
 
@@ -33,7 +36,7 @@ const dateText = data.date.toLocaleDateString('en-US', { year: 'numeric', month:
     </div>
 
     <p class="back measure">
-      <a href="/science/">← All writing</a>
+      <a href="/science/"><Text fr="← Tous les articles" en="← All writing" /></a>
     </p>
   </article>
 </BaseLayout>

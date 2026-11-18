@@ -1,5 +1,7 @@
 ---
+import Text from '../../components/Text.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { frenchText } from '../../lib/content-translations';
 import { getCollection } from 'astro:content';
 
 const published = (c: { data: { draft: boolean } }) => import.meta.env.DEV || !c.data.draft;
@@ -8,13 +10,13 @@ const galleries = (await getCollection('galleries', published)).sort(
 );
 ---
 
-<BaseLayout title="Photography" description="Photo galleries — each with its own mood, motion, and sound.">
+<BaseLayout title="Photographie" titleEn="Photography" description="Des galeries photo, chacune avec son ambiance, son mouvement et sa trame sonore." descriptionEn="Photo galleries — each with its own mood, motion, and sound.">
   <header class="intro wrap">
-    <p class="eyebrow" data-reveal>Photography</p>
-    <h1 data-reveal="1">Galleries</h1>
+    <p class="eyebrow" data-reveal><Text fr="Photographie" en="Photography" /></p>
+    <h1 data-reveal="1"><Text fr="Galeries" en="Galleries" /></h1>
     <p class="lede measure" data-reveal="2">
-      Each gallery is a place of its own — its own colour, typography, motion and, sometimes,
-      a sound to sit inside while you look.
+      <Text fr="Chaque galerie a son univers : ses couleurs, sa typographie, son mouvement et, parfois, une trame sonore pour accompagner le regard." en="Each gallery is a place of its own — its own colour, typography, motion and, sometimes,
+      a sound to sit inside while you look." />
     </p>
   </header>
 
@@ -24,9 +26,9 @@ const galleries = (await getCollection('galleries', published)).sort(
         <a href={`/photography/${g.id}/`} style={`--cover:url('${g.data.cover}'); --accent:${g.data.theme.accent ?? 'var(--accent)'}`}>
           <div class="thumb"><div class="thumb-bg"></div></div>
           <div class="meta">
-            <h2>{g.data.title}</h2>
-            <p class="place">{g.data.place}{g.data.place && ' · '}{g.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</p>
-            <p class="summary">{g.data.summary}</p>
+            <h2><Text fr={frenchText(g.data.title)} en={g.data.title} /></h2>
+            <p class="place">{g.data.place && <Text fr={frenchText(g.data.place)} en={g.data.place} />}{g.data.place && ' · '}<Text fr={g.data.date.toLocaleDateString('fr-CA', { year: 'numeric', month: 'short' })} en={g.data.date.toLocaleDateString('en-CA', { year: 'numeric', month: 'short' })} /></p>
+            <p class="summary"><Text fr={frenchText(g.data.summary)} en={g.data.summary} /></p>
           </div>
         </a>
       </li>
@@ -34,7 +36,7 @@ const galleries = (await getCollection('galleries', published)).sort(
   </ul>
 
   {galleries.length === 0 && (
-    <p class="measure empty">No galleries yet — add a markdown file in <code>src/content/galleries/</code>.</p>
+    <p class="measure empty"><Text fr="Les premières galeries arrivent bientôt." en="The first galleries are coming soon." /></p>
   )}
 </BaseLayout>
 

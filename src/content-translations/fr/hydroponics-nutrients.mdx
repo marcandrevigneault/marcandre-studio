@@ -1,0 +1,49 @@
+Quand vous cultivez sans terre, vous assumez une tâche que le sol accomplissait gratuitement : déterminer précisément ce que les racines vont absorber. Cela peut sembler intimidant. Pourtant, tout repose surtout sur un nombre et un peu de calcul.
+
+## Le nombre à retenir : la conductivité électrique
+
+L’eau pure conduit très peu l’électricité. Dissolvez-y des sels minéraux — nitrates, phosphates, potassium — et elle devient beaucoup plus conductrice. On peut donc *mesurer* la quantité de nutriments en solution en mesurant simplement la capacité de l’eau à conduire le courant. C’est la **conductivité électrique (EC)**, généralement exprimée en millisiemens par centimètre (mS/cm).
+
+Une approximation pratique relie l’EC à la quantité totale de matières dissoutes :
+
+$$
+\text{ppm} \approx k \cdot \text{EC} \quad\text{où}\quad k \in [500, 700]
+$$
+
+Le facteur de conversion $k$ dépend de la norme utilisée par votre appareil : un appareil à « échelle 500 » et un autre à « échelle 700 » donneront des lectures différentes pour la *même* eau. C’est la source de confusion la plus fréquente chez les débutants. Notez toujours l’échelle utilisée par votre appareil.
+
+> Un réservoir destiné aux légumes-feuilles se situe généralement autour de **1,4 à 1,8 mS/cm d’EC**. Les cultures à fruits, comme la tomate, en demandent davantage — souvent **2,0 à 3,0**.
+
+## Pourquoi les proportions comptent plus que le total
+
+Les plantes n’absorbent pas les nutriments dans n’importe quelles proportions. Les formulations classiques de type Hoagland maintiennent l’azote, le potassium et les autres éléments en équilibre. Si vous cherchez seulement à atteindre une EC cible, vous pouvez obtenir la bonne *quantité* de sels, mais pas la bonne *composition* : trop d’un ion, pas assez d’un autre.
+
+Voici la masse d’un nutriment nécessaire pour atteindre une concentration cible $C$ (en mg/L) dans un réservoir de volume $V$ (en litres) :
+
+$$
+m = \frac{C \cdot V}{1000} \quad [\text{grammes}]
+$$
+
+Pour atteindre 150 mg/L d’azote dans un réservoir de 40 L :
+
+```python
+C = 150   # concentration cible en mg/L
+V = 40    # volume en litres
+mass_g = C * V / 1000
+print(mass_g)   # -> 6.0 grammes de N (azote élémentaire)
+```
+
+En pratique, on ne dose pas de l’azote élémentaire : on ajoute un *sel fertilisant* qui n’est constitué qu’en partie d’azote. Il faut donc diviser par cette fraction. Le nitrate de calcium contient, par exemple, environ 15,5 % d’azote en masse. Il en faudrait donc à peu près `6,0 / 0,155 ≈ 38,7 g`.
+
+## Une méthode de mélange raisonnable
+
+1. **Commencez avec la bonne eau.** L’eau osmosée ou l’eau de pluie donne un point de départ connu (EC ≈ 0). L’eau du robinet contient déjà des minéraux dissous : mesurez-la d’abord.
+2. **Ajoutez les nutriments, mélangez, puis mesurez.** Ne suivez pas aveuglément le « X mL par litre » de l’étiquette : les appareils mesurent, les étiquettes arrondissent.
+3. **Ajustez le pH en dernier.** La plupart des cultures absorbent mieux les nutriments entre **5,5 et 6,2 de pH**. Ajustez-le *après* l’ajout des sels, puisqu’ils modifient eux-mêmes le pH.
+4. **Complétez le niveau avec de l’eau seule, sans nutriments.** À mesure que les plantes absorbent la solution, l’eau disparaît plus vite que les sels : l’EC *augmente* donc avec le temps. C’est contre-intuitif, mais c’est pourquoi on complète le niveau avec de l’eau.
+
+---
+
+Voilà le principe : la conductivité indique *combien*, les proportions indiquent *quels éléments*, et le pH détermine si les racines peuvent réellement les absorber. Faites fonctionner ces trois paramètres ensemble ; le reste est une question d’observation.
+
+*La prochaine fois : construire un capteur EC/pH en ligne à petit prix avec un microcontrôleur, puis enregistrer les mesures pour que le réservoir vous signale les écarts.*

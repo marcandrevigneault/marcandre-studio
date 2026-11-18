@@ -1,20 +1,21 @@
 ---
+import Text from '../../components/Text.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Art" description="Digital art and other visual explorations by Marc-André Vigneault.">
+<BaseLayout title="Art" description="Art numérique et explorations visuelles de Marc-André Vigneault." descriptionEn="Digital art and other visual explorations by Marc-André Vigneault.">
   <section class="wrap intro">
-    <p class="eyebrow">Art</p>
-    <h1>Another way of seeing.</h1>
-    <p class="lede">Digital art, studies and experiments in image-making.</p>
-    <div class="empty"><span>01 / A collection in the making</span><p>New work will find its home here.</p></div>
-    <a href="/projects/video-qr/">Explore the Video QR experiment →</a>
+    <p class="eyebrow"><Text fr="Art" en="Art" /></p>
+    <h1><Text fr="Voir autrement." en="Another way of seeing." /></h1>
+    <p class="lede"><Text fr="Art numérique, études et expériences autour de l’image." en="Digital art, studies and experiments in image-making." /></p>
+    <div class="empty"><span><Text fr="01 / Une collection prend forme" en="01 / A collection in the making" /></span><p><Text fr="De nouvelles créations s’installeront ici." en="New work will find its home here." /></p></div>
+    <a href="/projects/video-qr/"><Text fr="Découvrir l’expérience Vidéo QR →" en="Explore the Video QR experiment →" /></a>
   </section>
 </BaseLayout>
 <style>
   .intro { padding-block: clamp(3rem, 10vw, 7rem); }
   .lede { color: var(--muted); }
   .empty { border-block: 1px solid var(--line); padding-block: 3rem; margin-block: 3rem; }
-  .empty span { font: .75rem var(--font-mono); color: var(--muted); }
+  .empty > span { font: .75rem var(--font-mono); color: var(--muted); }
   .empty p { font: 1.6rem var(--font-serif); margin: 1rem 0 0; }
   a { text-decoration: underline; }
 </style>
