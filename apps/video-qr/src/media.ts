@@ -1,7 +1,7 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { MAX_VIDEO_BYTES } from './packet';
 
-export type CompressionOptions = { start: number; duration: number; width: number; fps: number; audioKbps: number };
+export type CompressionOptions = { start: number; duration: number; width: number; fps: number; audioKbps: number; colorMode?: 'color' | 'grayscale'; colorLevels?: 0 | 2 | 4 | 8; volume?: number };
 export const MAX_INPUT_BYTES = 100 * 1024 * 1024;
 export const MAX_DURATION = 10;
 type Job = { engine: FFmpeg; cancelled: boolean };
@@ -11,9 +11,12 @@ export function cancelMedia(): void {
   if (active) { active.cancelled = true; active.engine.terminate(); active = undefined; }
 }
 function validate(options: CompressionOptions): void {
-  if (!Object.values(options).every(Number.isFinite) || options.start < 0 || options.duration <= 0 || options.duration > MAX_DURATION ||
+  if (![options.start, options.duration, options.width, options.fps, options.audioKbps].every(Number.isFinite) || options.start < 0 || options.duration <= 0 || options.duration > MAX_DURATION ||
       !Number.isInteger(options.width) || options.width < 16 || options.width > 640 || options.width % 2 !== 0 ||
-      options.fps < 1 || options.fps > 30 || options.audioKbps < 0 || options.audioKbps > 128) {
+      options.fps < 1 || options.fps > 30 || options.audioKbps < 0 || options.audioKbps > 128 ||
+      (options.colorMode !== undefined && !['color', 'grayscale'].includes(options.colorMode)) ||
+      (options.colorLevels !== undefined && ![0, 2, 4, 8].includes(options.colorLevels)) ||
+      (options.volume !== undefined && (!Number.isFinite(options.volume) || options.volume < 0 || options.volume > 1))) {
     throw new Error('Invalid settings: duration ≤10s, even width 16–640px, fps 1–30, audio 0–128 kbps, nonnegative start.');
   }
 }
@@ -55,10 +58,20 @@ async function transcode(input: () => Promise<Uint8Array>, args: string[], outpu
 export async function compressVideo(file: File, options: CompressionOptions, onProgress?: (message: string) => void): Promise<Uint8Array> {
   validate(options);
   if (file.size < 1 || file.size > MAX_INPUT_BYTES) throw new Error('Choose a nonempty video no larger than 100 MiB.');
-  const audio = options.audioKbps === 0 ? ['-an'] : ['-map','0:a:0?','-c:a','libopus','-b:a',`${options.audioKbps}k`,'-ac','1'];
+  const audio = options.audioKbps === 0 || options.volume === 0 ? ['-an'] : ['-map','0:a:0?','-c:a','libopus','-b:a',`${options.audioKbps}k`,'-ac','1', ...(options.volume === undefined || options.volume === 1 ? [] : ['-af', `volume=${options.volume}`]),
+    // Tiny speech clips need fewer Opus packets and a narrow audio bandwidth.
+    // This avoids spending most of a single QR on packet overhead.
+    ...(options.audioKbps <= 8 ? ['-ar','8000','-application','voip','-frame_duration','60','-vbr','off'] : [])];
+  const filters = [`scale=${options.width}:-2`, `fps=${options.fps}`];
+  if (options.colorMode === 'grayscale') filters.push('hue=s=0');
+  if (options.colorLevels) {
+    const step = 255 / (options.colorLevels - 1);
+    const expression = `round(val/${step})*${step}`;
+    filters.push(`lutrgb=r='${expression}':g='${expression}':b='${expression}'`);
+  }
   return transcode(async () => new Uint8Array(await file.arrayBuffer()), [
     '-ss',String(options.start),'-i','input','-t',String(options.duration),
-    '-map','0:v:0','-vf',`scale=${options.width}:-2,fps=${options.fps}`,
+    '-map','0:v:0','-vf',filters.join(','),
     '-c:v','libvpx','-crf','50','-b:v','0','-deadline','realtime','-cpu-used','8','-threads','1',
     ...audio,'-map_metadata','-1','-f','webm','output.webm',
   ],'output.webm',onProgress);

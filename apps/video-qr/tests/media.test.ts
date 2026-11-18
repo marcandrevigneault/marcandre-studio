@@ -12,7 +12,7 @@ vi.mock('@ffmpeg/ffmpeg', () => ({ FFmpeg: class {
   async readFile() { return engine.output; }
   terminate() { this.terminated = true; this.files.clear(); }
 } }));
-import { compressVideo, playableVideo, cancelMedia } from '../src/media';
+import { compressVideo, playableVideo, cancelMedia, type CompressionOptions } from '../src/media';
 const options = {start:0,duration:2,width:96,fps:6,audioKbps:12};
 const file = () => new File([new Uint8Array([1,2])], 'clip.mp4', {type:'video/mp4'});
 beforeEach(() => {
@@ -45,8 +45,8 @@ it('cancelMedia rejects pending work', async () => {
   const pending = compressVideo(file(),options); cancelMedia(); release();
   await expect(pending).rejects.toThrow(/cancel/i);
 });
-it.each([{duration:0},{duration:11},{start:-1},{fps:NaN},{fps:0},{width:0},{audioKbps:-1}])('rejects invalid options %j before loading WASM', async invalid => {
-  await expect(compressVideo(file(),{...options,...invalid})).rejects.toThrow(); expect(engine.instances).toHaveLength(0);
+it.each([{duration:0},{duration:11},{start:-1},{fps:NaN},{fps:0},{width:0},{audioKbps:-1},{volume:-.1},{volume:1.1},{volume:NaN},{colorLevels:3},{colorMode:'sepia'}])('rejects invalid options %j before loading WASM', async invalid => {
+  await expect(compressVideo(file(),{...options,...invalid} as unknown as CompressionOptions)).rejects.toThrow(); expect(engine.instances).toHaveLength(0);
 });
 it('rejects empty/oversized inputs and output', async () => {
   await expect(compressVideo(new File([], 'empty'),options)).rejects.toThrow();

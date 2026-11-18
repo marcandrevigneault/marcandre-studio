@@ -9,7 +9,7 @@
 <body>
   <main id="film-app">
     <header><div><p class="eyebrow" data-copy="eyebrow">LA BÊTE LUMINEUSE / CINÉMA DE POCHE</p><h1 data-copy="title">Un passage, un QR.</h1></div><div class="languages" role="group" aria-label="Langue" data-label="language"><button id="fr" lang="fr" aria-label="Français" aria-pressed="true">FR</button><button id="en" lang="en" aria-label="English" aria-pressed="false">EN</button></div></header>
-    <p class="introduction" data-copy="intro">Choisissez un instant du film. Le film complet est proposé en basse résolution pour cette expérience ; votre QR contiendra les vrais octets d’un très court extrait, pas un lien.</p>
+    <p class="introduction" data-copy="intro">Un extrait du film en basse résolution. Ses vrais octets dans un QR, sans lien.</p>
     <div class="workspace">
       <section aria-labelledby="passage-title">
         <h2 id="passage-title" data-copy="passage">01 / Choisir le passage</h2>
@@ -19,30 +19,44 @@
           <div class="start-heading"><label for="start" data-copy="start">Début du passage</label><output id="timestamp" for="start start-seconds">10:00.0</output></div>
           <input id="start" type="range" min="0" max="600" step="0.1" value="600">
           <div class="precision"><label for="start-seconds" data-copy="precision">Position précise (secondes)</label><input id="start-seconds" type="number" min="0" max="600" step="0.1" value="600" required></div>
-          <p class="hint" data-copy="slidersHint">Les curseurs s’ajustent ensemble pour viser un seul QR. Le dernier réglage modifié est prioritaire.</p>
+          <p class="hint settings-hint" data-copy="slidersHint">Réglages liés : votre dernier choix est prioritaire.</p>
+          <div class="settings-grid">
           <div class="setting"><label for="duration" data-copy="duration">Durée</label><output id="duration-value" for="duration"></output><input id="duration" type="range" min="0.5" max="6" step="0.5" value="2"></div>
           <div class="setting"><label for="width" data-copy="width">Largeur de l’image</label><output id="width-value" for="width"></output><input id="width" type="range" min="16" max="96" step="2" value="32"></div>
           <div class="setting"><label for="fps" data-copy="fps">Images par seconde</label><output id="fps-value" for="fps"></output><input id="fps" type="range" min="1" max="8" step="1" value="2"></div>
           <div class="setting"><label for="audioKbps" data-copy="audio">Débit audio</label><output id="audioKbps-value" for="audioKbps"></output><input id="audioKbps" type="range" min="0" max="8" step="2" value="4"></div>
+          </div>
+          <div class="appearance-grid">
+            <label for="colorMode"><span data-copy="colorMode">Image</span><select id="colorMode"><option value="color" data-copy="color">Couleur</option><option value="grayscale" data-copy="grayscale">Noir et blanc</option></select></label>
+            <label for="colorLevels"><span data-copy="colorLevels">Palette avant encodage</span><select id="colorLevels"><option value="0">Complète</option><option value="2">8 couleurs</option><option value="4">64 couleurs</option><option value="8">512 couleurs</option></select></label>
+          </div>
+          <div class="sound-row">
+            <label class="sound-toggle" for="audio-enabled"><input id="audio-enabled" type="checkbox" checked><span data-copy="audioEnabled">Son activé</span></label>
+            <div class="setting volume-setting"><label for="volume" data-copy="volume">Volume</label><output id="volume-value" for="volume">100 %</output><input id="volume" type="range" min="0" max="100" step="1" value="100"></div>
+          </div>
         </fieldset>
       </section>
       <section class="result-column" aria-labelledby="capacity-title">
         <h2 id="capacity-title" data-copy="capacity">02 / Faire tenir le film</h2>
         <p id="estimate" class="capacity"></p>
         <progress id="capacity-meter" max="2905" value="0" aria-label="Capacité estimée" data-label="estimatedCapacity"></progress>
-        <p class="hint" data-copy="estimateHint">Une estimation, pas une garantie. À la génération, la taille réelle est mesurée et les réglages sont réduits si nécessaire, jusqu’à 20 essais.</p>
+        <p class="hint" data-copy="estimateHint">La taille réelle est vérifiée ; les réglages diminuent si nécessaire.</p>
         <div class="actions"><button id="generate" class="primary" disabled data-copy="generate">Générer le QR</button><button id="cancel" hidden data-copy="cancel">Annuler</button></div>
-        <p class="hint" data-copy="downloadHint">La compression utilise le film d’environ 18 Mo et un moteur vidéo local. L’aperçu peut aussi télécharger des données du film. Le traitement reste sur votre appareil.</p>
+        <details class="processing-details"><summary data-copy="processing">Traitement local · comment ça marche</summary><p class="hint" data-copy="downloadHint">La compression utilise le film d’environ 18 Mo et un moteur vidéo local. L’aperçu peut aussi télécharger des données du film. Le traitement reste sur votre appareil.</p></details>
         <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
         <p id="measured"></p>
         <div id="result" hidden>
-          <canvas id="qr" role="img" aria-label="Code QR de l’extrait" data-label="qrLabel"></canvas>
-          <p class="hint" data-copy="scanHint">Un seul paquet Video QR validé. Importez ce PNG dans le décodeur Video QR pour retrouver la vidéo.</p>
+          <button id="expand-qr" class="qr-zoom" aria-label="Agrandir le code QR" data-label="expandQR" aria-haspopup="dialog"><canvas id="qr" role="img" aria-label="Code QR de l’extrait" data-label="qrLabel"></canvas><span data-copy="expandQR">Agrandir le code QR</span></button>
+          <p class="hint" data-copy="scanHint">Retrouvez cet extrait en important le PNG dans le décodeur Video QR.</p>
           <video id="result-preview" controls playsinline hidden aria-label="Aperçu de l’extrait compressé" data-label="resultPreview"></video>
           <div class="downloads"><button id="download-qr" disabled data-copy="saveQR">Enregistrer le PNG</button><button id="download-video" disabled data-copy="saveVideo">Enregistrer le WebM</button></div>
         </div>
       </section>
     </div>
+    <dialog id="qr-dialog" aria-labelledby="qr-dialog-title">
+      <div class="dialog-heading"><h2 id="qr-dialog-title" data-copy="qrLabel">Code QR de l’extrait</h2><button id="close-qr" autofocus data-copy="close">Fermer</button></div>
+      <img id="large-qr" alt="Code QR de l’extrait" data-alt="qrLabel">
+    </dialog>
   </main>
   <script type="module" src="/src/film.ts"></script>
 </body>

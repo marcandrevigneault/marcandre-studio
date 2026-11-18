@@ -1,4 +1,5 @@
 ---
+import QRThumb from '../../components/QRThumb.astro';
 import Text from '../../components/Text.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
@@ -11,35 +12,52 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <a class="button" href="/tools/video-qr/index.html"><Text fr="Ouvrir l’encodeur / décodeur ↗" en="Open the encoder / decoder ↗" /></a>
     <p class="platforms"><Text fr="Web · Versions Android et iPhone en développement" en="Web · Android &amp; iPhone projects in development" /></p>
   </header>
+
+  <section class="wrap examples" aria-labelledby="examples-title">
+    <div class="section-heading"><p class="eyebrow"><Text fr="Les expériences" en="The experiments" /></p><h2 id="examples-title"><Text fr="La Bête lumineuse" en="La Bête lumineuse" /></h2><p><Text fr="Pierre Perrault, 1982" en="Pierre Perrault, 1982" /> · <a href="https://www.youtube.com/watch?v=7Co_VgBgI7g"><Text fr="Voir le film source ↗" en="Source film ↗" /></a></p></div>
+    <div class="samples">
+      <article class="sample">
+        <div class="screen"><video controls playsinline preload="none" poster="/examples/video-qr/poster.png" aria-label="Aperçu de huit secondes du film compressé" data-i18n-fr-aria-label="Aperçu de huit secondes du film compressé" data-i18n-en-aria-label="Eight-second preview of the compressed film"><source src="/examples/video-qr/film-preview.mp4" type="video/mp4" /></video></div>
+        <div class="sample-info">
+          <div class="sample-copy">
+            <p class="eyebrow"><Text fr="01 / Tout le film, en tout petit" en="01 / The whole film, made tiny" /></p>
+            <h3><Text fr="2 heures. 18,44 Mo." en="2 hours. 18.44 MB." /></h3>
+            <p><Text fr="96 × 59 pixels · 8 images/s · son mono." en="96 × 59 pixels · 8 FPS · mono audio." /></p>
+            <p class="caption"><Text fr="Un aperçu de 8 secondes du film compressé. Le film entier ne tient pas dans un seul QR." en="An eight-second preview of the compressed film. The full film does not fit in a single QR." /></p>
+          </div>
+        </div>
+      </article>
+      <article class="sample">
+        <div class="screen"><video controls playsinline preload="metadata" aria-label="Elle fait même pas d’ombre : extrait avec son" data-i18n-fr-aria-label="Elle fait même pas d’ombre : extrait avec son" data-i18n-en-aria-label="Elle fait même pas d’ombre: clip with sound"><source src="/examples/video-qr/elle-fait-meme-pas-dombre-vqr.mp4" type="video/mp4" /></video></div>
+        <div class="sample-info">
+          <div class="sample-copy">
+            <p class="eyebrow"><Text fr="02 / Un extrait, un QR" en="02 / One clip, one QR" /></p>
+            <h3><Text fr="« Elle fait même pas d’ombre »" en="« Elle fait même pas d’ombre »" /></h3>
+            <p><Text fr="3 secondes · son inclus · un seul QR." en="3 seconds · sound included · a single QR." /></p>
+            <p class="caption"><Text fr="Passage à 28:56 du film, réencodé avec cet outil." en="A passage at 28:56 in the film, re-encoded with this tool." /></p>
+          </div>
+          <QRThumb id="sample-02-qr" src="/examples/video-qr/elle-fait-meme-pas-dombre-vqr.png" title="Elle fait même pas d’ombre" />
+        </div>
+      </article>
+      <article class="sample">
+        <div class="screen"><video controls playsinline preload="none" aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-fr-aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-en-aria-label="Two-second sample encoded in the demonstration QR"><source src="/examples/video-qr/qr-preview.mp4" type="video/mp4" /></video></div>
+        <div class="sample-info">
+          <div class="sample-copy">
+            <p class="eyebrow"><Text fr="03 / À essayer" en="03 / Try it" /></p>
+            <h3><Text fr="Scanner. Reconstituer. Regarder." en="Scan. Reassemble. Play." /></h3>
+            <p><Text fr="2 secondes · 24 × 16 pixels · son mono." en="2 seconds · 24 × 16 pixels · mono audio." /></p>
+            <p class="caption"><Text fr="Scannez le QR avec le décodeur, ou téléchargez l’image pour l’importer." en="Scan the QR with the decoder, or download the image to import it." /></p>
+          </div>
+          <QRThumb id="sample-03-qr" src="/examples/video-qr/demo-qr.png" title="QR · 03" />
+        </div>
+      </article>
+    </div>
+  </section>
   <section class="wrap generator" aria-labelledby="generator-title">
     <p class="eyebrow"><Text fr="À vous de jouer" en="Your turn" /></p>
     <h2 id="generator-title"><Text fr="Choisissez votre petit morceau de cinéma." en="Choose your little piece of cinema." /></h2>
     <p class="caption"><Text fr="Parcourez le film, ajustez les curseurs et créez un QR contenant votre extrait. Le calcul se fait sur votre appareil." en="Explore the film, adjust the sliders, and make a QR containing your clip. Processing stays on your device." /></p>
     <iframe id="film-generator" src="/tools/video-qr/film.html" title="Créer un QR à partir du film" data-i18n-fr-title="Créer un QR à partir du film" data-i18n-en-title="Make a QR from the film" loading="lazy"></iframe>
-  </section>
-  <section class="wrap examples" aria-labelledby="examples-title">
-    <div class="section-heading"><p class="eyebrow"><Text fr="Les expériences" en="The experiments" /></p><h2 id="examples-title"><Text fr="La Bête lumineuse" en="La Bête lumineuse" /></h2><p><Text fr="Pierre Perrault, 1982" en="Pierre Perrault, 1982" /> · <a href="https://www.youtube.com/watch?v=7Co_VgBgI7g"><Text fr="Voir le film source ↗" en="Source film ↗" /></a></p></div>
-    <div class="grid">
-      <article><div class="screen"><video controls playsinline preload="none" poster="/examples/video-qr/poster.png" aria-label="Aperçu de huit secondes du film compressé" data-i18n-fr-aria-label="Aperçu de huit secondes du film compressé" data-i18n-en-aria-label="Eight-second preview of the compressed film"><source src="/examples/video-qr/film-preview.mp4" type="video/mp4" /></video></div><p class="eyebrow"><Text fr="01 / Tout le film, en tout petit" en="01 / The whole film, made tiny" /></p><h3><Text fr="2 heures. 18,44 Mo." en="2 hours. 18.44 MB." /></h3><p><Text fr="96 × 59 pixels · 8 images/s · son mono à 8 kbit/s." en="96 × 59 pixels · 8 FPS · 8 kbps mono audio." /></p><p class="caption"><Text fr="Un aperçu de 8 secondes tiré de notre première compression du film complet. Une rangée de pixels a été ajoutée pour la lecture en MP4. Le film entier nécessite plusieurs codes QR." en="An 8-second playback preview of our earlier full-film encode, padded by one row for MP4 playback. The full film requires many QR codes." /></p></article>
-      <article>
-        <div class="screen">
-          <video controls playsinline preload="metadata" aria-label="Elle fait pas d’ombre : extrait de trois secondes avec son" data-i18n-fr-aria-label="Elle fait pas d’ombre : extrait de trois secondes avec son" data-i18n-en-aria-label="Elle fait pas d’ombre: three-second clip with sound">
-            <source src="/examples/video-qr/elle-fait-pas-dombre.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <p class="eyebrow"><Text fr="02 / Priorité au son" en="02 / Sound first" /></p>
-        <h3><Text fr="« Elle fait pas d’ombre »" en="« Elle fait pas d’ombre »" /></h3>
-        <p><Text fr="3 secondes · 2 images/s · son mono." en="3 seconds · 2 FPS · mono audio." /></p>
-        <p class="caption"><Text fr="Le QR retrouvé contient six images de 20 × 14 pixels et le son, dans 2 891 octets. La vidéo ci-dessus en présente une version agrandie à 320 × 224 pixels." en="The recovered QR holds six 20 × 14 frames and sound in 2,891 bytes. The video above is an enlarged 320 × 224 playback version." /></p>
-        <a class="legacy-qr" href="/examples/video-qr/elle-fait-pas-dombre-qr.png" download="elle-fait-pas-dombre-qr.png">
-          <img src="/examples/video-qr/elle-fait-pas-dombre-qr.png" width="1480" height="1480" loading="lazy" alt="Code QR original de l’extrait Elle fait pas d’ombre, au format QMV1" data-i18n-fr-alt="Code QR original de l’extrait Elle fait pas d’ombre, au format QMV1" data-i18n-en-alt="Original QR code for Elle fait pas d’ombre, in QMV1 format" />
-          <span><Text fr="Télécharger le QR original ↓" en="Download the original QR ↓" /></span>
-        </a>
-        <p class="caption"><Text fr="Ce QR utilise l’ancien format QMV1, incompatible avec le décodeur actuel. La vidéo peut être regardée directement ici." en="This QR uses the legacy QMV1 format, which the current decoder does not support. Watch the video directly here." /></p>
-      </article>
-    </div>
-    <article class="qr-demo"><div><p class="eyebrow"><Text fr="03 / Un QR à essayer" en="03 / Try a new QR" /></p><h3><Text fr="Scanner. Reconstituer. Regarder." en="Scan. Reassemble. Play." /></h3><p><Text fr="Cet extrait de 2 secondes tient dans un seul QR. Ouvrez le décodeur sur un autre appareil, ou enregistrez l’image pour l’y importer." en="This new 2-second sample is stored in one QR. Open the decoder on another device, or save and import the image." /></p><video controls playsinline preload="none" aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-fr-aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-en-aria-label="Two-second sample encoded in the demonstration QR"><source src="/examples/video-qr/qr-preview.mp4" type="video/mp4" /></video><p class="caption"><Text fr="24 × 16 pixels · 2 images/s · son mono. Cet extrait a été généré à partir du film déjà compressé, dans le format QR du décodeur actuel." en="24 × 16 · 2 FPS · mono audio. Newly generated from the earlier compressed film; not the original chat’s QR format." /></p></div><a href="/examples/video-qr/demo-qr.png" download="video-qr-demo.png" aria-label="Télécharger le code QR de démonstration" data-i18n-fr-aria-label="Télécharger le code QR de démonstration" data-i18n-en-aria-label="Download the demonstration QR code"><img src="/examples/video-qr/demo-qr.png" width="555" height="555" alt="QR contenant une vidéo de deux secondes avec son, à lire avec le décodeur Vidéo QR" data-i18n-fr-alt="QR contenant une vidéo de deux secondes avec son, à lire avec le décodeur Vidéo QR" data-i18n-en-alt="QR containing a two-second video and sound; use the Video QR decoder" /><span><Text fr="Télécharger le QR ↓" en="Download QR ↓" /></span></a></article>
-    <details><summary><Text fr="Premiers essais dans un seul QR" en="Earlier single-QR results" /></summary><p><Text fr="Les notes de l’expérience précédente rapportent un extrait couleur de 3 secondes avec son à 40 × 29 pixels (2 915 octets), ainsi qu’une version privilégiant le son à 24 × 17 pixels (2 775 octets). Ces mesures historiques sont distinctes du QR retrouvé à l’exemple 02 : 2 891 octets, au format QMV1." en="The earlier experiment notes report a 3-second color clip with sound at 40 × 29 (2,915 bytes), and an audio-priority version at 24 × 17 (2,775 bytes). Those historical measurements are distinct from the recovered QR in example 02: 2,891 bytes in QMV1 format." /></p></details>
   </section>
 </BaseLayout>
 <script>
@@ -56,9 +74,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   #film-generator { display: block; width: 100%; height: 1100px; border: 1px solid var(--line); margin-top: 2rem; }
 
   .intro { padding-block: clamp(3rem, 9vw, 7rem) 3rem; }.back { display: inline-block; font-size: .8rem; margin-bottom: 2.5rem; color: var(--muted); }.lede { max-width: 49ch; color: var(--muted); font-size: 1.2rem; }.button { display: inline-block; padding: .85rem 1.3rem; background: var(--ink); color: var(--paper); }.button:hover { background: var(--accent); }.platforms { font-size: .75rem; margin-top: .8rem; color: var(--muted); }
-  .examples { padding-bottom: 5rem; }.section-heading { padding-top: 2rem; border-top: 1px solid var(--line); }.section-heading > p:last-child { color: var(--muted); font-size: .8rem; }.section-heading a { text-decoration: underline; }.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }.screen { aspect-ratio: 8 / 5; background: #161813; display: grid; place-items: center; margin-bottom: 1.5rem; overflow: hidden; }.screen video,.screen img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }.caption { color: var(--muted); font-size: .8rem; max-width: 55ch; }article > p { margin-bottom: .6rem; }article .eyebrow { margin-top: 1rem; }
-  .qr-demo { border-block: 1px solid var(--line); margin-block: 2.5rem 1rem; padding-block: 2rem; display: grid; grid-template-columns: 1fr minmax(260px, 400px); align-items: center; gap: 3rem; }.qr-demo video { width: 240px; max-width: 100%; image-rendering: pixelated; }.qr-demo a { text-align: center; font-size: .8rem; }.qr-demo img { width: 100%; }details { max-width: 70ch; font-size: .85rem; color: var(--muted); }summary { cursor: pointer; padding-block: .8rem; }a:focus-visible,summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-  @media(max-width: 650px) { .grid,.qr-demo { grid-template-columns: 1fr; }.qr-demo { gap: 1rem; } }
-  .legacy-qr { display: grid; gap: .6rem; width: min(100%, 296px); margin-block: 1rem; text-align: center; font-size: .8rem; }
-  .legacy-qr img { width: 100%; height: auto; }
+  .examples { padding-bottom: 3rem; }
+  .section-heading { padding-top: 2rem; border-top: 1px solid var(--line); }
+  .section-heading > p:last-child { color: var(--muted); font-size: .8rem; }
+  .section-heading a { text-decoration: underline; }
+  .sample { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); align-items: center; gap: clamp(1rem, 3vw, 2.5rem); padding-block: 1.5rem; border-bottom: 1px solid var(--line); }
+  .screen { aspect-ratio: 8 / 5; background: #161813; overflow: hidden; }
+  .screen video { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  .sample-info { display: flex; align-items: center; justify-content: space-between; gap: clamp(.75rem, 2vw, 1.5rem); min-width: 0; }
+  .sample-copy { flex: 1; min-width: 0; }
+  .sample-copy h3 { font-size: clamp(1.15rem, 2vw, 1.6rem); }
+  .sample-copy p { margin-bottom: .6rem; }
+  .sample-copy .eyebrow { margin-top: 0; }
+  .sample-copy p:last-child { margin-bottom: 0; }
+  .caption { color: var(--muted); font-size: .8rem; max-width: 55ch; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  @media(max-width: 650px) { .sample { grid-template-columns: 1fr; } }
 </style>

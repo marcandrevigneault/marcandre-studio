@@ -111,3 +111,10 @@ cancelling invalidates the previous result. Compression runs in the browser.
 Both interfaces default to French and share the `studio-language` preference
 with the site; `?lang=fr` or `?lang=en` explicitly selects a language. The recovered
 QMV1 QR shown as example 02 is a legacy format, separate from generated VQR packets.
+
+The film simulator also supports grayscale, RGB palette quantization (2, 4, or
+8 levels per channel), a mute switch, and volume. Palette sizes describe the
+pre-encode quantization; lossy VP8 decoding can introduce intermediate shades.
+Volume zero and mute omit the audio track. For audio targets up to 8 kbps,
+compression uses 8 kHz mono, 60 ms Opus frames, and constant bitrate to reduce
+packet overhead and avoid unpredictable bitrate overshoot in tiny QR clips.

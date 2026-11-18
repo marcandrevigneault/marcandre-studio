@@ -11,23 +11,29 @@ const copy = {
   title: ['Un passage, un QR.', 'One passage, one QR.'],
   pageTitle: ['Un passage, un QR — La bête lumineuse', 'One passage, one QR — La bête lumineuse'],
   language: ['Langue', 'Language'],
-  intro: ['Choisissez un instant du film. Le film complet est proposé en basse résolution pour cette expérience ; votre QR contiendra les vrais octets d’un très court extrait, pas un lien.', 'Choose a moment from the film. The full film is provided at low resolution for this experiment; your QR will contain the actual bytes of a very short clip, not a link.'],
+  intro: ['Un extrait du film en basse résolution. Ses vrais octets dans un QR, sans lien.', 'A clip from the low-resolution film. Its actual bytes in a QR, without a link.'],
   passage: ['01 / Choisir le passage', '01 / Choose the passage'],
   sourcePreview: ['Aperçu du film', 'Film preview'],
   settings: ['Réglages de l’extrait', 'Clip settings'],
   start: ['Début du passage', 'Passage start'],
-  precision: ['Position précise (secondes)', 'Precise position (seconds)'],
-  slidersHint: ['Les curseurs s’ajustent ensemble pour viser un seul QR. Le dernier réglage modifié est prioritaire.', 'The sliders adjust together to target one QR. Your last edited setting takes priority.'],
-  duration: ['Durée', 'Duration'], width: ['Largeur de l’image', 'Image width'],
-  fps: ['Images par seconde', 'Frames per second'], audio: ['Débit audio', 'Audio bitrate'],
+  precision: ['Position (secondes)', 'Position (seconds)'],
+  slidersHint: ['Réglages liés : votre dernier choix est prioritaire.', 'Linked settings: your latest choice takes priority.'],
+  duration: ['Durée', 'Duration'], width: ['Largeur', 'Width'],
+  fps: ['Cadence', 'Frame rate'], audio: ['Débit audio', 'Audio bitrate'],
   capacity: ['02 / Faire tenir le film', '02 / Fit the film'],
   estimatedCapacity: ['Capacité estimée', 'Estimated capacity'],
   estimate: ['Estimation : {bytes} / {budget} octets', 'Estimate: {bytes} / {budget} bytes'],
-  estimateHint: ['Une estimation, pas une garantie. À la génération, la taille réelle est mesurée et les réglages sont réduits si nécessaire, jusqu’à 20 essais.', 'An estimate, not a guarantee. Generation measures the actual size and reduces settings if needed, for up to 20 attempts.'],
+  estimateHint: ['La taille réelle est vérifiée ; les réglages diminuent si nécessaire.', 'Actual size is verified; settings are reduced if needed.'],
   generate: ['Générer le QR', 'Generate QR'], cancel: ['Annuler', 'Cancel'],
   downloadHint: ['La compression utilise le film d’environ 18 Mo et un moteur vidéo local. L’aperçu peut aussi télécharger des données du film. Le traitement reste sur votre appareil.', 'Compression uses the roughly 18 MB film and a local video engine. The preview may also download film data. Processing stays on your device.'],
+  processing: ['Traitement local · comment ça marche', 'Local processing · how it works'],
+  colorMode: ['Image', 'Image'], color: ['Couleur', 'Color'], grayscale: ['Noir et blanc', 'Black & white'],
+  colorLevels: ['Palette avant encodage', 'Palette before encoding'], fullPalette: ['Complète', 'Full'],
+  colors: ['{count} couleurs', '{count} colors'], grayLevels: ['{count} niveaux de gris', '{count} gray levels'],
+  audioEnabled: ['Son activé', 'Sound enabled'], volume: ['Volume', 'Volume'],
+  expandQR: ['Agrandir le code QR', 'Enlarge QR code'], close: ['Fermer', 'Close'],
   qrLabel: ['Code QR de l’extrait', 'Clip QR code'],
-  scanHint: ['Un seul paquet Video QR validé. Importez ce PNG dans le décodeur Video QR pour retrouver la vidéo.', 'One validated Video QR packet. Import this PNG into the Video QR decoder to recover the video.'],
+  scanHint: ['Retrouvez cet extrait en important le PNG dans le décodeur Video QR.', 'Recover this clip by importing the PNG into the Video QR decoder.'],
   resultPreview: ['Aperçu de l’extrait compressé', 'Compressed clip preview'],
   saveQR: ['Enregistrer le PNG', 'Save PNG'], saveVideo: ['Enregistrer le WebM', 'Save WebM'],
   loading: ['Lecture des métadonnées du film…', 'Reading film metadata…'],
@@ -60,6 +66,8 @@ const button = (id: string) => el<HTMLButtonElement>(id);
 const source = el<HTMLVideoElement>('film-preview');
 const preview = el<HTMLVideoElement>('result-preview');
 const canvas = el<HTMLCanvasElement>('qr');
+const qrDialog = el<HTMLDialogElement>('qr-dialog');
+let qrFocus: HTMLElement | null = null;
 let stored: string | null = null;
 try { stored = localStorage.getItem(LANGUAGE_KEY); } catch { /* Optional storage. */ }
 let language = resolveLanguage(location.search, stored);
@@ -67,7 +75,9 @@ const t = (key: Key, params: Record<string, string | number> = {}) =>
   copy[key][language === 'fr' ? 0 : 1].replace(/\{(\w+)\}/g, (match, name: string) => String(params[name] ?? match));
 const number = (value: number) => value.toLocaleString(language === 'fr' ? 'fr-CA' : 'en-CA');
 let message: () => string = () => t('loading');
-let settings = fitEstimate({ duration: 2, width: 32, fps: 2, audioKbps: 4 }, 'duration');
+let settings: FilmSettings = fitEstimate({ duration: 2, width: 32, fps: 2, audioKbps: 4, colorMode: 'color', colorLevels: 0, volume: 1 }, 'duration');
+let previousAudioKbps = 4;
+let previousVolume = 1;
 let start = 600;
 let filmDuration = 0;
 let epoch = 0;
@@ -79,11 +89,27 @@ let measured: { bytes: number; attempt: number } | undefined;
 let resultBlob: Blob | undefined;
 let playbackURL = '';
 let validPacket = false;
-const keys: (keyof FilmSettings)[] = ['duration', 'width', 'fps', 'audioKbps'];
+const keys = ['duration', 'width', 'fps', 'audioKbps'] as const;
 
 function status(render: () => string) { message = render; el('status').textContent = message(); }
 function renderValues() {
   for (const key of keys) input(key).value = String(settings[key]);
+  el<HTMLSelectElement>('colorMode').value = settings.colorMode ?? 'color';
+  const palette = el<HTMLSelectElement>('colorLevels');
+  palette.value = String(settings.colorLevels ?? 0);
+  for (const option of palette.options) {
+    const levels = Number(option.value);
+    option.textContent = levels === 0 ? t('fullPalette') : t(settings.colorMode === 'grayscale' ? 'grayLevels' : 'colors', { count: settings.colorMode === 'grayscale' ? levels : levels ** 3 });
+  }
+  const volume = Math.round((settings.volume ?? 1) * 100);
+  input('volume').value = String(volume);
+  el('volume-value').textContent = volume ? volume + ' %' : t('silent');
+  input('volume').setAttribute('aria-valuetext', el('volume-value').textContent!);
+  input('audio-enabled').checked = settings.audioKbps > 0 && volume > 0;
+  // Keep source listening consistent with the requested clip. Color processing applies on generation.
+  source.style.filter = settings.colorMode === 'grayscale' ? 'grayscale(1)' : '';
+  source.muted = !input('audio-enabled').checked;
+  source.volume = settings.volume ?? 1;
   input('start').value = String(start);
   input('start-seconds').value = String(start);
   const minutes = Math.floor(start / 60);
@@ -104,6 +130,7 @@ function renderLanguage() {
   document.title = t('pageTitle');
   document.querySelectorAll<HTMLElement>('[data-copy]').forEach(node => { node.textContent = t(node.dataset.copy as Key); });
   document.querySelectorAll<HTMLElement>('[data-label]').forEach(node => { node.setAttribute('aria-label', t(node.dataset.label as Key)); });
+  el<HTMLImageElement>('large-qr').alt = t('qrLabel');
   for (const value of ['fr', 'en']) button(value).setAttribute('aria-pressed', String(language === value));
   el('status').textContent = message();
   renderValues();
@@ -127,6 +154,9 @@ function controls() {
   button('download-video').disabled = !validPacket || exporting;
 }
 function clearResult() {
+  qrFocus = null;
+  if (qrDialog.open) qrDialog.close();
+  el<HTMLImageElement>('large-qr').removeAttribute('src');
   validPacket = false; resultBlob = undefined;
   preview.pause(); preview.removeAttribute('src'); preview.load(); preview.hidden = true;
   if (playbackURL) URL.revokeObjectURL(playbackURL);
@@ -151,9 +181,41 @@ function seekPreview() {
 }
 for (const key of keys) input(key).oninput = () => {
   invalidate();
-  settings = fitEstimate({ ...settings, [key]: Number(input(key).value) }, key);
+  const value = Number(input(key).value);
+  if (key === 'audioKbps' && value > 0) previousAudioKbps = value;
+  settings = fitEstimate({ ...settings, [key]: value }, key);
   clampToFilm(); renderValues(); seekPreview(); controls();
   status(() => t('changed'));
+};
+function changeExtra(next: FilmSettings, changed: keyof FilmSettings) {
+  invalidate();
+  settings = fitEstimate(next, changed);
+  clampToFilm(); renderValues(); seekPreview(); controls();
+  status(() => t('changed'));
+}
+el<HTMLSelectElement>('colorMode').onchange = () => {
+  const colorMode = el<HTMLSelectElement>('colorMode').value === 'grayscale' ? 'grayscale' : 'color';
+  changeExtra({ ...settings, colorMode }, 'colorMode');
+};
+el<HTMLSelectElement>('colorLevels').onchange = () => {
+  const colorLevels = Number(el<HTMLSelectElement>('colorLevels').value) as 0 | 2 | 4 | 8;
+  changeExtra({ ...settings, colorLevels }, 'colorLevels');
+};
+input('audio-enabled').onchange = () => {
+  const enabled = input('audio-enabled').checked;
+  if (!enabled) {
+    if (settings.audioKbps > 0) previousAudioKbps = settings.audioKbps;
+    if ((settings.volume ?? 1) > 0) previousVolume = settings.volume ?? 1;
+  }
+  changeExtra({
+    ...settings, audioKbps: enabled ? settings.audioKbps || previousAudioKbps : 0,
+    volume: enabled && settings.volume === 0 ? previousVolume : settings.volume ?? 1,
+  }, 'audioKbps');
+};
+input('volume').oninput = () => {
+  const volume = Number(input('volume').value) / 100;
+  if (volume > 0) previousVolume = volume;
+  changeExtra({ ...settings, volume }, 'volume');
 };
 function changeStart(control: HTMLInputElement) {
   invalidate();
@@ -276,6 +338,18 @@ async function save(kind: 'qr' | 'video') {
     if (job === epoch) status(() => t('exportError', { error: errorText(error) }));
   } finally { exporting = false; controls(); }
 }
+button('expand-qr').onclick = () => {
+  if (!validPacket) return;
+  qrFocus = document.activeElement instanceof HTMLElement ? document.activeElement : button('expand-qr');
+  el<HTMLImageElement>('large-qr').src = canvas.toDataURL('image/png');
+  qrDialog.showModal();
+};
+button('close-qr').onclick = () => qrDialog.close();
+qrDialog.addEventListener('close', () => {
+  el<HTMLImageElement>('large-qr').removeAttribute('src');
+  if (validPacket && qrFocus?.isConnected) qrFocus.focus();
+  qrFocus = null;
+});
 button('download-qr').onclick = () => void save('qr');
 button('download-video').onclick = () => void save('video');
 window.addEventListener('pagehide', () => { invalidate(); source.pause(); });

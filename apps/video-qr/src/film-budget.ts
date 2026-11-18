@@ -1,10 +1,11 @@
 import { HEADER_BYTES, MAX_PACKET_BYTES } from './packet';
 export const VIDEO_BUDGET = MAX_PACKET_BYTES - HEADER_BYTES;
-export type FilmSettings = { duration: number; width: number; fps: number; audioKbps: number };
+export type FilmSettings = { duration: number; width: number; fps: number; audioKbps: number; colorMode?: 'color' | 'grayscale'; colorLevels?: 0 | 2 | 4 | 8; volume?: number };
 // WebM overhead and content complexity vary. This is a responsive estimate only;
 // the generator must measure the encoded bytes before offering a QR.
 export function estimateBytes(s: FilmSettings): number {
-  return Math.ceil(650 + s.duration * (s.audioKbps * 125 + s.width * s.width * .065 * s.fps));
+  const colorFactor = (s.colorMode === 'grayscale' ? .7 : 1) * (s.colorLevels === 2 ? .65 : s.colorLevels === 4 ? .8 : 1);
+  return Math.ceil(650 + s.duration * ((s.volume === 0 ? 0 : s.audioKbps) * 125 + s.width * s.width * .065 * s.fps * colorFactor));
 }
 function reduce(s: FilmSettings, key: keyof FilmSettings): FilmSettings | null {
   const next = { ...s };

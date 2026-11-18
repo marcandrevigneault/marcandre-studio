@@ -17,3 +17,20 @@ Retrieved context: chats “Pixel Count Answer” and “Compress YouTube video 
 The earlier chat reports single-QR results of 2,915 bytes (3 seconds, 40×29) and 2,775 bytes (24×17, audio priority). These remain historical reported measurements, distinct from the recovered 2,891-byte QMV1 example above; they are not verified sizes of that recovered QR or interoperability tests.
 
 This directory includes the compressed full-film source for the local generator as well as short playback examples and QR assets. No ownership of the source film is asserted.
+
+## Current-encoder version of « Elle fait même pas d’ombre »
+
+`elle-fait-meme-pas-dombre-vqr.webm` was generated using the browser's film
+encoder from the full-film source at 1736.4 seconds (28:56.4), for 3 seconds,
+16×10 pixels, 1 FPS, 4 kbps mono Opus. The passage was located by normalized
+cross-correlation with the recovered clip's audio (best match 1736.3805 seconds,
+score 0.4235; next separate match 0.1769) and checked against its picture.
+Low-rate audio uses 8 kHz, 60 ms Opus packets, and constant bitrate to retain the
+whole phrase within the QR budget. The WebM is 2,903 bytes; its VQR packet is
+2,951 bytes, below the version-40-L byte capacity. The PNG was scanned and decoded
+with the current PacketCollector, recovering the exact WebM bytes.
+
+The matching `-vqr.mp4` is a browser-friendly H.264/AAC playback rendering of
+that newly encoded WebM, enlarged with nearest-neighbor interpolation. The old
+QMV1 PNG and old MP4 are retained as source/reference assets, not the displayed
+sample 02. The current sample preserves all three seconds and audio.

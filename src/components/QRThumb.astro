@@ -1,0 +1,66 @@
+---
+import Text from './Text.astro';
+interface Props { id: string; src: string; title: string; }
+const { id, src, title } = Astro.props;
+---
+<div class="qr-thumb" data-qr-thumb>
+  <button type="button" class="qr-open" aria-haspopup="dialog" aria-controls={id} aria-label={`Agrandir le QR : ${title}`} data-i18n-fr-aria-label={`Agrandir le QR : ${title}`} data-i18n-en-aria-label={`Expand QR: ${title}`}>
+    <img src={src} alt="" loading="lazy" />
+    <Text fr="Agrandir ↗" en="Expand ↗" />
+  </button>
+  <dialog id={id} aria-labelledby={`${id}-title`}>
+    <div class="qr-panel">
+      <div class="qr-heading">
+        <h3 id={`${id}-title`}>{title}</h3>
+        <button type="button" class="qr-close" autofocus><Text fr="Fermer ×" en="Close ×" /></button>
+      </div>
+      <img class="qr-large" src={src} alt={`Code QR : ${title}`} data-i18n-fr-alt={`Code QR : ${title}`} data-i18n-en-alt={`QR code: ${title}`} loading="lazy" />
+      <a href={src} download><Text fr="Télécharger le QR ↓" en="Download QR ↓" /></a>
+    </div>
+  </dialog>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-qr-thumb]').forEach(root => {
+    const trigger = root.querySelector<HTMLButtonElement>('.qr-open')!;
+    const dialog = root.querySelector<HTMLDialogElement>('dialog')!;
+    const close = root.querySelector<HTMLButtonElement>('.qr-close')!;
+    trigger.addEventListener('click', () => dialog.showModal());
+    close.addEventListener('click', () => dialog.close());
+    // Native dialog handles Escape and makes the page beneath it inert.
+    dialog.addEventListener('keydown', event => {
+      if (event.key !== 'Tab') return;
+      const download = dialog.querySelector<HTMLAnchorElement>('a[download]')!;
+      if (event.shiftKey && document.activeElement === close) {
+        event.preventDefault(); download.focus();
+      } else if (!event.shiftKey && document.activeElement === download) {
+        event.preventDefault(); close.focus();
+      }
+    });
+    dialog.addEventListener('close', () => trigger.focus());
+    let backdropPress = false;
+    const outside = (event: PointerEvent | MouseEvent) => {
+      const box = dialog.getBoundingClientRect();
+      return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+    };
+    dialog.addEventListener('pointerdown', event => { backdropPress = event.target === dialog && outside(event); });
+    dialog.addEventListener('click', event => {
+      if (backdropPress && event.target === dialog && outside(event)) dialog.close();
+      backdropPress = false;
+    });
+  });
+</script>
+<style>
+  .qr-thumb { width: clamp(88px, 12vw, 120px); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .qr-open { display: grid; gap: .4rem; width: 100%; padding: 0; border: 0; background: transparent; font-size: .72rem; text-align: center; }
+  .qr-open img { width: 100%; height: auto; aspect-ratio: 1; background: white; }
+  dialog { width: min(640px, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; border: 1px solid var(--line); color: var(--ink); background: var(--paper); overflow: auto; }
+  dialog::backdrop { background: rgb(0 0 0 / .72); }
+  .qr-panel { display: grid; gap: 1rem; padding: clamp(1rem, 4vw, 2rem); }
+  .qr-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+  h3 { font-size: 1.15rem; margin: 0; }
+  .qr-close { flex-shrink: 0; min-height: 44px; padding: .4rem .6rem; border: 1px solid var(--line); background: transparent; font-size: .8rem; }
+  .qr-large { width: 100%; max-height: 65dvh; object-fit: contain; background: white; }
+  a { text-align: center; text-decoration: underline; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+</style>
