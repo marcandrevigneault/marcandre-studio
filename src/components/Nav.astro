@@ -97,7 +97,19 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
   const preview = visitorView();
   const back = document.querySelector<HTMLAnchorElement>('.visitor-return');
   const link = document.querySelector<HTMLAnchorElement>('.admin-link');
-  fetch('/api/auth/session', {cache:'no-store'}).then(r=>r.json()).then(data=>{if(link)link.hidden=data.authenticated!==true || preview;if(back)back.hidden=!(data.authenticated===true && preview);}).catch(()=>{});
+  fetch('/api/auth/session', {cache:'no-store'}).then(r=>r.json()).then(data=>{
+    if(link) link.hidden=data.authenticated!==true || preview;
+    if(back) {
+      back.hidden=data.authenticated!==true;
+      back.textContent=preview ? 'Retour à l’administration ↗' : 'Voir comme visiteur ↗';
+      if(!preview) {
+        const target=new URL(location.href);
+        target.searchParams.delete('edit');
+        target.searchParams.set('visitor','1');
+        back.href=target.pathname+target.search+target.hash;
+      }
+    }
+  }).catch(()=>{});
 </script>
 <style>
   .admin-link[hidden] { display: none; }
