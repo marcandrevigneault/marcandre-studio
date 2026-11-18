@@ -40,15 +40,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
       </article>
       <article class="sample">
-        <div class="screen"><video controls playsinline preload="none" aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-fr-aria-label="Extrait de deux secondes encodé dans le QR de démonstration" data-i18n-en-aria-label="Two-second sample encoded in the demonstration QR"><source src="/examples/video-qr/qr-preview.mp4" type="video/mp4" /></video></div>
+        <div class="screen"><video controls playsinline preload="none" poster="/examples/video-qr/extrait-sans-son-03-poster.png" aria-label="Extrait de trois secondes sans son contenu dans le QR" data-i18n-fr-aria-label="Extrait de trois secondes sans son contenu dans le QR" data-i18n-en-aria-label="Three-second silent clip stored in the QR"><source src="/examples/video-qr/extrait-sans-son-03.mp4" type="video/mp4" /></video></div>
         <div class="sample-info">
           <div class="sample-copy">
             <p class="eyebrow"><Text fr="03 / À essayer" en="03 / Try it" /></p>
-            <h3><Text fr="Scanner. Reconstituer. Regarder." en="Scan. Reassemble. Play." /></h3>
-            <p><Text fr="2 secondes · 24 × 16 pixels · son mono." en="2 seconds · 24 × 16 pixels · mono audio." /></p>
+            <h3><Text fr="Un extrait sans son." en="A silent clip." /></h3>
+            <p><Text fr="3 secondes · 36 × 22 pixels · 3 images/s · sans son." en="3 seconds · 36 × 22 pixels · 3 FPS · no audio." /></p>
             <p class="caption"><Text fr="Scannez le QR avec le décodeur, ou téléchargez l’image pour l’importer." en="Scan the QR with the decoder, or download the image to import it." /></p>
           </div>
-          <QRThumb id="sample-03-qr" src="/examples/video-qr/demo-qr.png" title="QR · 03" />
+          <QRThumb id="sample-03-qr" src="/examples/video-qr/extrait-sans-son-03.png" title="QR · 03" />
         </div>
       </article>
     </div>
