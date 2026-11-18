@@ -74,7 +74,7 @@ export default {
         const start = new Date(); start.setUTCDate(start.getUTCDate()-days+1); const since = start.toISOString().slice(0,10);
         const totals = await db.prepare('SELECT COUNT(*) AS totalViews,COUNT(DISTINCT session) AS totalVisits FROM events WHERE day>=?').bind(since).first();
         const rows = await db.prepare('SELECT day,COUNT(*) AS views,COUNT(DISTINCT session) AS visits FROM events WHERE day>=? GROUP BY day ORDER BY day').bind(since).all();
-        const pages = await db.prepare('SELECT path,COUNT(*) AS views FROM events WHERE day>=? GROUP BY path ORDER BY views DESC LIMIT 20').bind(since).all();
+        const pages = await db.prepare('SELECT path,COUNT(*) AS views FROM events WHERE day>=? GROUP BY path ORDER BY views DESC, path ASC').bind(since).all();
         const started = await db.prepare("SELECT value FROM metadata WHERE key='startedAt'").first();
         const daily = Array.from({length:days},(_,i)=>{const date=new Date(start);date.setUTCDate(date.getUTCDate()+i);const day=date.toISOString().slice(0,10);return rows.results.find(r=>r.day===day)??{day,views:0,visits:0};});
         return json({days,startedAt:started?.value??null,...totals,daily,pages:pages.results,updatedAt:new Date().toISOString()});

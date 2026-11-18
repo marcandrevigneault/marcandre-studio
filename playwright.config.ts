@@ -12,5 +12,5 @@ export default defineConfig({
     { name: 'iphone-webkit', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
     { name: 'android-chromium', use: { ...devices['Pixel 7'], browserName: 'chromium' } },
   ],
-  webServer: { command: 'npm run dev -- --host 127.0.0.1 --port 4340', url: 'http://127.0.0.1:4340', reuseExistingServer: !process.env.CI, timeout: 60000 },
+  webServer: { command: 'npm run dev -- --host 127.0.0.1 --port 4340', url: 'http://127.0.0.1:4340', reuseExistingServer: false, env: { SESSION_SECRET: 'frontend-tests-only-not-a-production-secret', STUDIO_ADMIN_URL: '', STUDIO_ADMIN_KEY: '' }, timeout: 60000 },
 });

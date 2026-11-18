@@ -27,6 +27,13 @@ describe('private admin data service',()=>{
     const result=await (await call('/stats?days=7')).json();expect(result.totalViews).toBe(2);expect(result.totalVisits).toBe(1);expect(result.daily).toHaveLength(7);expect(result.pages).toHaveLength(2);
     expect((await call('/events',{id:crypto.randomUUID(),session,path:'/admin/login?password=oops'})).status).toBe(400);
   });
+  it('returns every visited page beyond the former top twenty',async()=>{
+    const session=crypto.randomUUID();
+    for(let i=0;i<25;i++)await call('/events',{id:crypto.randomUUID(),session,path:`/projects/page-${i}/`});
+    const stats=await (await call('/stats?days=30')).json();
+    expect(stats.pages).toHaveLength(25);
+    expect(stats.pages.reduce((sum:number,p:any)=>sum+p.views,0)).toBe(stats.totalViews);
+  });
   it('limits password attempts across calls',async()=>{
     for(let i=0;i<10;i++)expect((await (await call('/attempt',{key:'a'.repeat(64)})).json()).allowed).toBe(true);
     expect((await (await call('/attempt',{key:'a'.repeat(64)})).json()).allowed).toBe(false);

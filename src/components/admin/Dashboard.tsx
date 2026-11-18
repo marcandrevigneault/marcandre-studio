@@ -11,7 +11,7 @@ interface Stats {
   totalViews: number;
   totalVisits: number;
   daily: { day: string; views: number; visits: number }[];
-  pages: { path: string; views: number }[];
+  pages: { path: string; title?: string; views: number }[];
   updatedAt: string;
 }
 
@@ -58,10 +58,10 @@ function Traffic({ stats }: { stats: Stats }) {
         </table></div>
       </details>
     </>}
-    <div className="dashboard-pages"><h3>Pages consultées</h3>
+    <div className="dashboard-pages" id="vues-par-page"><h3>Vues par page</h3><p className="dashboard-note">Consultations sur les {stats.days} derniers jours, y compris les pages sans vue. Une personne peut consulter plusieurs fois la même page.</p>
       {stats.pages.length === 0 ? <p className="dashboard-note">Aucune page enregistrée sur cette période.</p> :
-        <div className="dashboard-table-wrap"><table><caption className="dashboard-sr">Pages consultées sur {stats.days} jours</caption><thead><tr><th scope="col">Chemin</th><th scope="col">Pages vues</th></tr></thead><tbody>
-          {stats.pages.map(p => <tr key={p.path}><th scope="row"><code>{p.path}</code></th><td>{number.format(p.views)}</td></tr>)}
+        <div className="dashboard-table-wrap"><table><caption className="dashboard-sr">Vues par page sur {stats.days} jours</caption><thead><tr><th scope="col">Page</th><th scope="col">Vues</th></tr></thead><tbody>
+          {stats.pages.map(p => <tr key={p.path}><th scope="row"><span className="dashboard-page-title">{p.title ?? p.path}</span><code>{p.path}</code></th><td>{number.format(p.views)}</td></tr>)}
         </tbody></table></div>}
     </div>
     <p className="dashboard-note dashboard-updated">Mise à jour : {timestamp(stats.updatedAt)} UTC</p>
@@ -212,7 +212,7 @@ export default function Dashboard() {
     <div className="dashboard-content">
       {logoutError && <p className="dashboard-error" role="alert">{logoutError}</p>}
       <div className="dashboard-intro"><div><p className="dashboard-kicker">Votre espace de travail</p><h1>Tableau de bord<span>.</span></h1><p className="dashboard-note">Un regard sur le site. Une place pour vos prochaines idées.</p></div><a className="btn" href="/admin/new">+ Nouvelle galerie</a></div>
-      <nav className="dashboard-nav" aria-label="Sections du tableau de bord"><a href="#activite">Vue d’ensemble</a><a href="#contenus">Articles & liens</a><a href="#galeries">Galeries</a><a href="#securite">Sécurité</a></nav>
+      <nav className="dashboard-nav" aria-label="Sections du tableau de bord"><a href="#activite">Vue d’ensemble</a><a href="#vues-par-page">Vues par page</a><a href="#contenus">Articles & liens</a><a href="#galeries">Galeries</a><a href="#securite">Sécurité</a></nav>
       <section id="activite" aria-labelledby="activity-title">
         <header className="dashboard-section-head"><div><p className="dashboard-kicker">01 / Audience</p><h2 id="activity-title">L’activité du site</h2></div>
           <div className="dashboard-period" role="group" aria-label="Période des statistiques">{([7, 30] as const).map(period => <button key={period} type="button" aria-pressed={days === period} onClick={() => { if (period !== days) { setStats(null); setStatsPending(true); setStatsError(''); setDays(period); } }}>{period} jours</button>)}</div>
